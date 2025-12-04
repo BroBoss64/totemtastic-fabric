@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "totem_of_resurrection",
+	"version": "${version}",
+	"name": "Totem of Resurrection",
+	"description": "Adds a totem to revive players in hardcore.",
+	"authors": [
+		"BroBoss64"
+	],
+	"contact": {
+		"homepage": "https://github.com/BroBoss64/",
+		"sources": "https://github.com/BroBoss64/"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/totem_of_resurrection/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"broboss64.totem_of_resurrection.TotemOfResurrection"
+		],
+		"fabric-datagen": [
+			"broboss64.totem_of_resurrection.TotemOfResurrectionDataGenerator"
+		]
+	},
+	"mixins": [
+		"totem_of_resurrection.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.18.1",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
