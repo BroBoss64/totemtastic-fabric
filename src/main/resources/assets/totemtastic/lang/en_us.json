@@ -1,0 +1,17 @@
+{
+  "item.totemtastic.test": "Test",
+  "item.totemtastic.wood_totem_shell": "Wooden Totem Shell",
+  "item.totemtastic.gold_totem_shell": "Gold Totem Shell",
+  "item.totemtastic.quartz_totem_shell": "Quartz Totem Shell",
+  "item.totemtastic.lapis_totem_shell": "Lapis Totem Shell",
+  "item.totemtastic.resurrection_core": "Resurrection Core",
+  "item.totemtastic.teleportation_core": "Teleportation Core",
+  "item.totemtastic.undying_core": "Undying Core",
+  "item.totemtastic.crude_resurrection_totem": "Crude Totem of Resurrection",
+  "item.totemtastic.resurrection_totem": "Totem of Resurrection",
+  "item.totemtastic.wormhole_totem": "Wormhole Totem",
+  "item.totemtastic.recall_totem": "Recall Totem",
+  "item.totemtastic.glass_vial": "Glass Vial",
+  "item.totemtastic.blood_vial": "Blood Vial",
+  "item.totemtastic.iron_knife": "Iron Knife"
+}

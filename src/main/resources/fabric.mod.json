@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "totem_of_resurrection",
+	"id": "totemtastic",
 	"version": "${version}",
-	"name": "Totem of Resurrection",
-	"description": "Adds a totem to revive players in hardcore.",
+	"name": "Totemtastic",
+	"description": "Adds some more totems, with different functionality.",
 	"authors": [
 		"BroBoss64"
 	],
@@ -12,18 +12,21 @@
 		"sources": "https://github.com/BroBoss64/"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/totem_of_resurrection/icon.png",
+	"icon": "assets/totemtastic/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"broboss64.totem_of_resurrection.TotemOfResurrection"
+          "broboss64.totemtastic.Totemtastic"
 		],
+      "client": [
+        "broboss64.totemtastic.TotemtasticClient"
+      ],
 		"fabric-datagen": [
-			"broboss64.totem_of_resurrection.TotemOfResurrectionDataGenerator"
+          "broboss64.totemtastic.TotemtasticDataGen"
 		]
 	},
 	"mixins": [
-		"totem_of_resurrection.mixins.json"
+      "totemtastic.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.18.1",
