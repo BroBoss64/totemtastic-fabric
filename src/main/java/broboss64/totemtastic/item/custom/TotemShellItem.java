@@ -1,4 +1,4 @@
-package broboss64.totemtastic.item;
+package broboss64.totemtastic.item.custom;
 
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
@@ -9,14 +9,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class TeleportationCoreItem extends Item {
-    public TeleportationCoreItem(Settings settings) {
+public class TotemShellItem extends Item {
+    public TotemShellItem(Settings settings) {
         super(settings);
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.of("It's trying to teleport away."));
+        tooltip.add(Text.of("§7An empty shell waiting for a core."));
         super.appendTooltip(stack, world, tooltip, context);
     }
 }

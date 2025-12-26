@@ -13,5 +13,10 @@
   "item.totemtastic.recall_totem": "Recall Totem",
   "item.totemtastic.glass_vial": "Glass Vial",
   "item.totemtastic.blood_vial": "Blood Vial",
-  "item.totemtastic.iron_knife": "Iron Knife"
+  "item.totemtastic.iron_knife": "Iron Knife",
+
+  "death.attack.stab_self": "%s stabbed themself",
+  "death.attack.stab_self.player": "%s stabbed themselves while trying to escape %s",
+  "death.attack.stabbing": "%s was stabbed by %s.",
+  "death.attack.stabbing.item": "%s was stabbed by %s using %s"
 }

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 public class Totemtastic implements ModInitializer {
 	public static final String MOD_ID = "totemtastic";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    public static final String PLAYER_UUID_KEY = "OwnerUUID";
 
 	@Override
 	public void onInitialize() {
