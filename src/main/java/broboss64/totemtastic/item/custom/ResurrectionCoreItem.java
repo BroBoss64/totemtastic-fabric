@@ -16,7 +16,7 @@ public class ResurrectionCoreItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.of("§7You can feel it beating."));
+        tooltip.add(Text.of("§7Your hand goes numb when holding it."));
         super.appendTooltip(stack, world, tooltip, context);
     }
 }
