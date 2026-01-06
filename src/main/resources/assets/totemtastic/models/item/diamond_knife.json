@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "totemtastic:item/diamond_knife"
+  }
+}

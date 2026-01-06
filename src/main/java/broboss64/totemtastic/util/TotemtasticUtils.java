@@ -2,12 +2,10 @@ package broboss64.totemtastic.util;
 
 import broboss64.totemtastic.Totemtastic;
 import broboss64.totemtastic.item.TotemtasticItems;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
@@ -22,7 +20,7 @@ import net.minecraft.world.World;
 
 import java.util.UUID;
 
-public class TotemtasticItemUtils {
+public class TotemtasticUtils {
 
     public static ItemStack createBoundItemStack(Item item, Integer count, UUID itemUUID) {
         if (count == null || count == 0) {
@@ -117,5 +115,9 @@ public class TotemtasticItemUtils {
             player.getInventory().setStack(player.getInventory().selectedSlot, taggedStack);
             player.getWorld().playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1, 1);
         }
+    }
+
+    public static int getTimesResurrected(ServerPlayerEntity player) {
+        return 1;
     }
 }

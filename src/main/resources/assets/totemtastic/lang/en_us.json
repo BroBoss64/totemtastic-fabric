@@ -17,7 +17,14 @@
 
   "item.totemtastic.glass_vial": "Glass Vial",
   "item.totemtastic.blood_vial": "Blood Vial",
+
+  "item.totemtastic.flint_knife": "Flint Knife",
+  "item.totemtastic.gold_knife": "Gold Knife",
   "item.totemtastic.iron_knife": "Iron Knife",
+  "item.totemtastic.diamond_knife": "Diamond Knife",
+  "item.totemtastic.netherite_knife": "Netherite Knife",
+
+  "effect.totemtastic.umbra_mortis": "Umbra Mortis",
 
   "death.attack.stab_self": "%s stabbed themself",
   "death.attack.stab_self.player": "%s stabbed themselves while trying to escape %s",

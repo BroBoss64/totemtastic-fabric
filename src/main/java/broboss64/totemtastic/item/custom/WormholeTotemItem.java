@@ -2,7 +2,7 @@ package broboss64.totemtastic.item.custom;
 
 import broboss64.totemtastic.Totemtastic;
 import broboss64.totemtastic.item.TotemtasticItems;
-import broboss64.totemtastic.util.TotemtasticItemUtils;
+import broboss64.totemtastic.util.TotemtasticUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.PlayerListEntry;
@@ -45,11 +45,11 @@ public class WormholeTotemItem extends Item {
         if (!world.isClient()) {
             if (hand == Hand.MAIN_HAND) {
                 //only triggers if in main hand
-                UUID totemUUID = TotemtasticItemUtils.fetchUUIDFromItemStack(user.getMainHandStack());
+                UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getMainHandStack());
                 if (totemUUID != null && user.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
                     if (user.isSneaking()) {
                         //shows bound player name
-                        String boundPlayerName = "This totem will warp to " + TotemtasticItemUtils.getUsernameFromUUID(totemUUID, world.getServer());
+                        String boundPlayerName = "This totem will warp to " + TotemtasticUtils.getUsernameFromUUID(totemUUID, world.getServer());
                         user.sendMessage(Text.literal(boundPlayerName), true);
                         user.stopUsingItem();
                         return TypedActionResult.success(user.getMainHandStack(), true);
@@ -59,7 +59,7 @@ public class WormholeTotemItem extends Item {
                     }
                 } else if (user.getOffHandStack().getItem() == TotemtasticItems.BLOOD_VIAL) {
                     //binds it
-                    TotemtasticItemUtils.bindTotemFromVial(user);
+                    TotemtasticUtils.bindTotemFromVial(user);
                     user.stopUsingItem();
                 } else {
                     //cancels if bound uuid is missing or invalid
@@ -81,16 +81,17 @@ public class WormholeTotemItem extends Item {
     @Override
     public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         if (!world.isClient() && user instanceof  PlayerEntity) {
-            UUID totemUUID = TotemtasticItemUtils.fetchUUIDFromItemStack(stack);
+            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
             PlayerEntity playerUsing = (PlayerEntity) user;
             ServerWorld serverWorld = (ServerWorld) world;
-            PlayerEntity targetPlayer = TotemtasticItemUtils.getPlayerEntityFromUUID((ServerWorld) world, totemUUID);
+            PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, totemUUID);
             if (remainingUseTicks >= 1 && !user.isSneaking() && user.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
                 //runs every tick
                 serverWorld.spawnParticles(ParticleTypes.PORTAL, user.getX(), user.getY() + 1, user.getZ(),
                         2, 0.25, 0.5, 0.25, 0.2);
                 if (targetPlayer != null) {
-                    serverWorld.spawnParticles(ParticleTypes.PORTAL, targetPlayer.getX(), targetPlayer.getY() + 1, targetPlayer.getZ(),
+                    ServerWorld targetWorld = (ServerWorld) targetPlayer.getWorld();
+                    targetWorld.spawnParticles(ParticleTypes.PORTAL, targetPlayer.getX(), targetPlayer.getY() + 1, targetPlayer.getZ(),
                             2, 0.25, 0.5, 0.25, 0.2);
                 }
 
@@ -107,7 +108,7 @@ public class WormholeTotemItem extends Item {
     }
 
     private void warpToPlayer(World world, PlayerEntity user, UUID targetUUID) {
-        PlayerEntity targetPlayer = TotemtasticItemUtils.getPlayerEntityFromUUID((ServerWorld) world, targetUUID);
+        PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, targetUUID);
         if (targetPlayer != null) {
             if (user == targetPlayer) {
                 user.sendMessage(Text.literal("You can't warp to yourself!"), true);
@@ -118,7 +119,7 @@ public class WormholeTotemItem extends Item {
                 double targetY = targetPlayer.getY();
                 double targetZ = targetPlayer.getZ();
                 serverUser.teleport((ServerWorld) targetDimension, targetX, targetY, targetZ, targetPlayer.getYaw(), targetPlayer.getPitch());
-                targetDimension.playSoundFromEntity(null, targetPlayer, SoundEvents.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.6f, 1);
+                targetDimension.playSoundFromEntity(null, user, SoundEvents.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.6f, 1);
                 user.getMainHandStack().decrement(1);
             }
 
@@ -131,7 +132,7 @@ public class WormholeTotemItem extends Item {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         NbtCompound nbt = stack.getNbt();
         if (nbt != null && nbt.contains(Totemtastic.PLAYER_UUID_KEY)) {
-            UUID totemUUID = TotemtasticItemUtils.fetchUUIDFromItemStack(stack);
+            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
             MinecraftClient client = MinecraftClient.getInstance();
             PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
             if (entry != null) {

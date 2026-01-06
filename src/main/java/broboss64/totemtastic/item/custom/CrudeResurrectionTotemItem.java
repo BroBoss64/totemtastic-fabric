@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
@@ -32,9 +33,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class ResurrectionTotemItem extends Item {
+public class CrudeResurrectionTotemItem extends Item {
 
     private static final double MAX_USE_REACH = Math.sqrt(ServerPlayNetworkHandler.MAX_BREAK_SQUARED_DISTANCE);
+
 
     @Override
     public int getMaxUseTime(ItemStack stack) {
@@ -150,6 +152,8 @@ private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUse
         MinecraftServer server = world.getServer();
         ReviveState state = ReviveState.get((ServerWorld) world);
         int currentReviveCount = state.getReviveCount(deadPlayerUUID);
+        StatusEffectInstance effect = new StatusEffectInstance(
+                Totemtastic.UMBRA_MORTIS, Integer.MAX_VALUE, currentReviveCount, true, false);
         ServerPlayerEntity playerToRevive = (ServerPlayerEntity) TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, deadPlayerUUID);
         World targetDimension = itemUser.getWorld();
         double targetX = hitResult.getPos().x;
@@ -159,16 +163,17 @@ private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUse
         playerToRevive.teleport((ServerWorld) targetDimension, targetX, targetY, targetZ, 0, 0);
         playerToRevive.changeGameMode(GameMode.SURVIVAL);
         playerToRevive.setHealth(1);
-        state.setReviveCount(deadPlayerUUID, currentReviveCount + 1);
+        state.setReviveCount(deadPlayerUUID,currentReviveCount + 1);
         world.playSoundFromEntity(null, playerToRevive, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1, 1);
         ((ServerWorld) world).spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, targetX, targetY + 1, targetZ, 100, 0, 0, 0, 1);
+        playerToRevive.addStatusEffect(effect);
         //damages the user, killing them unless they have absorption or bonus health
         itemUser.damage(world.getDamageSources().magic(), 20);
     }
 }
 
 
-public ResurrectionTotemItem(Settings settings) {
+public CrudeResurrectionTotemItem(Settings settings) {
     super(settings);
 }
 }
