@@ -5,10 +5,14 @@ import broboss64.totemtastic.item.custom.*;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.minecraft.item.Item;
+import net.minecraft.item.SmithingTemplateItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+
+import java.util.List;
 
 public class TotemtasticItems {
     //totem shells
@@ -20,6 +24,10 @@ public class TotemtasticItems {
     public static final Item RESURRECTION_CORE = registerItem("resurrection_core", new ResurrectionCoreItem(new FabricItemSettings()));
     public static final Item TELEPORTATION_CORE = registerItem("teleportation_core", new TeleportationCoreItem(new FabricItemSettings()));
     public static final Item UNDYING_CORE = registerItem("undying_core", new UndyingCoreItem(new FabricItemSettings()));
+    //smithing templates
+    public static final Item RESURRECTION_SMITHING_TEMPLATE = registerItem("resurrection_smithing_template", new SmithingTemplateItem(Text.literal("Quartz Totem Shell"), Text.literal("Resurrection Core"), Text.literal("Totem of Resurrection Forging"), Text.literal("Quartz Totem Shell"), Text.literal("Resurrection Core"), List.of(new Identifier(Totemtastic.MOD_ID, "item/empty_slot_totem_shell")), List.of(new Identifier(Totemtastic.MOD_ID, "item/empty_slot_totem_core"))));
+    public static final Item TELEPORTATION_SMITHING_TEMPLATE = registerItem("teleportation_smithing_template", new SmithingTemplateItem(Text.literal("Lapis/Golden Totem Shell"), Text.literal("Teleportation Core"), Text.literal("Wormhole/Recall Totem Forging"), Text.literal("Lapis/Golden Totem Shell"), Text.literal("Teleportation Core"), List.of(new Identifier(Totemtastic.MOD_ID, "item/empty_slot_totem_shell")), List.of(new Identifier(Totemtastic.MOD_ID, "item/empty_slot_totem_core"))));
+    public static final Item UNDYING_SMITHING_TEMPLATE = registerItem("undying_smithing_template", new SmithingTemplateItem(Text.literal("Golden Totem Shell"), Text.literal("Undying Core"), Text.literal("Totem of Undying Forging"), Text.literal("Golden Totem Shell"), Text.literal("Undying Core"), List.of(new Identifier(Totemtastic.MOD_ID, "item/empty_slot_totem_shell")), List.of(new Identifier(Totemtastic.MOD_ID, "item/empty_slot_totem_core"))));
     //totem items
     public static final Item CRUDE_RESURRECTION_TOTEM = registerItem("crude_resurrection_totem", new CrudeResurrectionTotemItem(new FabricItemSettings().maxCount(1)));
     public static final Item RESURRECTION_TOTEM = registerItem("resurrection_totem", new ResurrectionTotemItem(new FabricItemSettings().maxCount(1).rarity(Rarity.RARE)));

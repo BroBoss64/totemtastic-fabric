@@ -143,8 +143,8 @@ public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> too
         }
 
     } else {
-        tooltip.add(Text.literal("§7Not bound to a player"));
-        tooltip.add(Text.literal("§7Hold a blood vial in the offhand and use to bind"));
+        tooltip.add(Text.literal("Will resurrect the bound player with a 20% max health reduction, and deals 10 hearts of damage to user."));
+        tooltip.add(Text.literal("Not Bound to a player").formatted(Formatting.GRAY));
     }
 }
 private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUser, HitResult hitResult) {
@@ -164,6 +164,8 @@ private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUse
         playerToRevive.changeGameMode(GameMode.SURVIVAL);
         playerToRevive.setHealth(1);
         state.setReviveCount(deadPlayerUUID,currentReviveCount + 1);
+        int newReviveCount = state.getReviveCount(deadPlayerUUID);
+        playerToRevive.sendMessage(Text.literal(String.valueOf(newReviveCount)));
         world.playSoundFromEntity(null, playerToRevive, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1, 1);
         ((ServerWorld) world).spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, targetX, targetY + 1, targetZ, 100, 0, 0, 0, 1);
         playerToRevive.addStatusEffect(effect);

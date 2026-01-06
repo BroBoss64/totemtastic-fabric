@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:smithing_transform",
+  "base": {
+    "item": "totemtastic:golden_totem_shell"
+  },
+  "addition": {
+    "item": "totemtastic:undying_core"
+  },
+  "template": {
+    "item": "totemtastic:undying_smithing_template"
+  },
+  "result": {
+    "item": "minecraft:totem_of_undying"
+  }
+}

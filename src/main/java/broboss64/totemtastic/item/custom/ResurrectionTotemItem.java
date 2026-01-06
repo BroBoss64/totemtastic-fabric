@@ -141,15 +141,15 @@ public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> too
         }
 
     } else {
-        tooltip.add(Text.literal("§7Not bound to a player"));
-        tooltip.add(Text.literal("§7Hold a blood vial in the offhand and use to bind"));
+        tooltip.add(Text.literal("Will resurrect the bound player, and deals 10 hearts of damage to user.").formatted(Formatting.GRAY));
+        tooltip.add(Text.literal("Will also remove all stacks of Umbra Mortis from the revived player").formatted(Formatting.GRAY));
+        tooltip.add(Text.literal("Not Bound to a player").formatted(Formatting.GRAY));
     }
 }
 private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUser, HitResult hitResult) {
     if (!world.isClient()) {
         MinecraftServer server = world.getServer();
         ReviveState state = ReviveState.get((ServerWorld) world);
-        int currentReviveCount = state.getReviveCount(deadPlayerUUID);
         ServerPlayerEntity playerToRevive = (ServerPlayerEntity) TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, deadPlayerUUID);
         World targetDimension = itemUser.getWorld();
         double targetX = hitResult.getPos().x;
@@ -159,7 +159,9 @@ private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUse
         playerToRevive.teleport((ServerWorld) targetDimension, targetX, targetY, targetZ, 0, 0);
         playerToRevive.changeGameMode(GameMode.SURVIVAL);
         playerToRevive.setHealth(1);
-        state.setReviveCount(deadPlayerUUID, currentReviveCount + 1);
+        state.setReviveCount(deadPlayerUUID, 0);
+        int currentReviveCount = state.getReviveCount(deadPlayerUUID);
+        playerToRevive.sendMessage(Text.literal(String.valueOf(currentReviveCount)));
         world.playSoundFromEntity(null, playerToRevive, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1, 1);
         ((ServerWorld) world).spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, targetX, targetY + 1, targetZ, 100, 0, 0, 0, 1);
         //damages the user, killing them unless they have absorption or bonus health

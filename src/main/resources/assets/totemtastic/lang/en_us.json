@@ -1,8 +1,8 @@
 {
   "item.totemtastic.hwumboid": "Hwumboid",
 
-  "item.totemtastic.wood_totem_shell": "Wooden Totem Shell",
-  "item.totemtastic.gold_totem_shell": "Gold Totem Shell",
+  "item.totemtastic.wooden_totem_shell": "Wooden Totem Shell",
+  "item.totemtastic.golden_totem_shell": "Golden Totem Shell",
   "item.totemtastic.quartz_totem_shell": "Quartz Totem Shell",
   "item.totemtastic.lapis_totem_shell": "Lapis Totem Shell",
 
@@ -28,6 +28,6 @@
 
   "death.attack.stab_self": "%s stabbed themself",
   "death.attack.stab_self.player": "%s stabbed themselves while trying to escape %s",
-  "death.attack.stabbing": "%s was stabbed by %s.",
-  "death.attack.stabbing.item": "%s was stabbed by %s using %s"
+  "death.attack.stabbing": "%1$s was stabbed.",
+  "death.attack.stabbing.player": "%1$s was stabbed by %2$s"
 }

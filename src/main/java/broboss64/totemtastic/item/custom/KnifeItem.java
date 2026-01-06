@@ -53,8 +53,12 @@ public class KnifeItem extends Item {
         if (offHandItem.getItem() == TotemtasticItems.GLASS_VIAL) {
             ItemStack bloodVial = TotemtasticUtils.createBoundItemStack(
                     TotemtasticItems.BLOOD_VIAL, 1, player.getUuid());
-            player.giveItemStack(bloodVial);
-            player.setStackInHand(Hand.OFF_HAND, new ItemStack(offHandItem.getItem(), offHandItem.getCount() - 1));
+            if (offHandItem.getCount() == 1) {
+                player.setStackInHand(Hand.OFF_HAND, bloodVial);
+            } else {
+                player.giveItemStack(bloodVial);
+                player.setStackInHand(Hand.OFF_HAND, new ItemStack(offHandItem.getItem(), offHandItem.getCount() - 1));
+            }
             world.playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1, 1);
         }
     }
@@ -74,9 +78,6 @@ public class KnifeItem extends Item {
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (!attacker.getWorld().isClient() && attacker instanceof PlayerEntity player) {
-            DamageSource source = new DamageSource(attacker.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(STABBING), attacker);
-            float damage = (float) player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
-            target.damage(source, damage);
             stack.damage(1, player, player1 -> player1.sendToolBreakStatus(Hand.MAIN_HAND));
         }
         return true;
