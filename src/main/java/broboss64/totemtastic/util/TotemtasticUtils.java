@@ -57,8 +57,7 @@ public class TotemtasticUtils {
             int x = coordsTag.getInt("x");
             int y = coordsTag.getInt("y");
             int z = coordsTag.getInt("z");
-            BlockPos blockPos = new BlockPos(x, y, z);
-            return blockPos;
+            return new BlockPos(x, y, z);
         }else {
             return null;
         }
@@ -73,8 +72,7 @@ public class TotemtasticUtils {
             String dimString = coordsTag.getString("dimension");
             Identifier dimID = new Identifier(dimString);
             RegistryKey<World> worldKey = RegistryKey.of(RegistryKeys.WORLD, dimID);
-            ServerWorld targetWorld = server.getWorld(worldKey);
-            return targetWorld;
+            return server.getWorld(worldKey);
         }else {
             return null;
         }
@@ -98,8 +96,7 @@ public class TotemtasticUtils {
         if (player != null) {
             return player.getName().getString();
         } else {
-            String fallback = "Offline Player (" + playerUUID.toString() + ")";
-            return fallback;
+            return "Offline Player (" + playerUUID.toString() + ")";
         }
     }
     public static PlayerEntity getPlayerEntityFromUUID(ServerWorld world, UUID uuid) {
@@ -115,9 +112,5 @@ public class TotemtasticUtils {
             player.getInventory().setStack(player.getInventory().selectedSlot, taggedStack);
             player.getWorld().playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1, 1);
         }
-    }
-
-    public static int getTimesResurrected(ServerPlayerEntity player) {
-        return 1;
     }
 }

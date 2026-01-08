@@ -2,7 +2,6 @@ package broboss64.totemtastic.util;
 
 import broboss64.totemtastic.Totemtastic;
 import broboss64.totemtastic.util.loot.IsHardcoreLootCondition;
-import com.mojang.serialization.Codec;
 import net.minecraft.loot.condition.LootConditionType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;

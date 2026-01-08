@@ -13,10 +13,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -24,7 +22,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
@@ -49,77 +46,80 @@ public class ResurrectionTotemItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack heldStack = user.getStackInHand(hand);
-        if (!world.isClient() && this.getHitResult(user).getType() != HitResult.Type.BLOCK) {
+        ItemStack mainHandStack = user.getStackInHand(hand);
+        if (hand == Hand.OFF_HAND) return TypedActionResult.fail(mainHandStack);
+        if (this.getHitResult(user).getType() == HitResult.Type.MISS) {
+            //only runs if player isn't looking at the air
             if (user.getOffHandStack().getItem() == TotemtasticItems.BLOOD_VIAL) {
-                TotemtasticUtils.bindTotemFromVial(user);
-                user.stopUsingItem();
+                if (!world.isClient()) {
+                    //handles binding of totem
+                    UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getOffHandStack());
+                    TotemtasticUtils.bindTotemFromVial(user);
+                    String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
+                    user.sendMessage(Text.literal("Bound to " + boundToName), true);
+                    return TypedActionResult.consume(mainHandStack);
+                }
             } else {
-                user.stopUsingItem();
-                return TypedActionResult.fail(heldStack);
+                return TypedActionResult.pass(mainHandStack);
             }
-
         }
-        return TypedActionResult.fail(heldStack);
-    }
-
-    @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (!context.getWorld().isClient()) {
-            PlayerEntity player = context.getPlayer();
-            UUID targetUUID = TotemtasticUtils.fetchUUIDFromItemStack(context.getStack());
-            PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) context.getWorld(), targetUUID);
-            if (targetUUID == null) {
-                player.stopUsingItem();
-                player.sendMessage(Text.literal("Not bound or invalid player!"), true);
-                return ActionResult.FAIL;
-            } else if (!targetPlayer.isSpectator() || targetPlayer == null) {
-                player.stopUsingItem();
-                player.sendMessage(Text.literal("Player is not dead or offline!"), true);
-                return ActionResult.FAIL;
-            } else if (this.getHitResult(player).getType() == HitResult.Type.BLOCK && player.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
-                player.setCurrentHand(context.getHand());
-            } else {
-                player.stopUsingItem();
-                return ActionResult.FAIL;
-            }
-            return ActionResult.FAIL;
+        if (this.getHitResult(user).getType() == HitResult.Type.BLOCK) {
+            //only runs if player is looking at a block
+            if (!world.isClient()) {
+                UUID targetUUID = TotemtasticUtils.fetchUUIDFromItemStack(mainHandStack);
+                if (user.getOffHandStack().getItem() == TotemtasticItems.BLOOD_VIAL) {
+                    //handles binding of totem
+                    UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getOffHandStack());
+                    TotemtasticUtils.bindTotemFromVial(user);
+                    String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
+                    user.sendMessage(Text.literal("Bound to " + boundToName), true);
+                    return TypedActionResult.success(mainHandStack);
+                } else if (targetUUID == null) {
+                    //handles null UUID
+                    user.sendMessage(Text.literal("Not Bound!").formatted(Formatting.RED), true);
+                    return TypedActionResult.fail(mainHandStack);
+                } else {
+                    PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, targetUUID);
+                    if (targetPlayer == null) {
+                        //if PlayerEntity doesn't exist, cancel usage
+                        user.sendMessage(Text.literal("Player is offline!").formatted(Formatting.RED), true);
+                        return TypedActionResult.fail(mainHandStack);
+                    } else if (!targetPlayer.isSpectator()) {
+                        //if player isn't in spectator mode, cancel usage
+                        user.sendMessage(Text.literal("Player is not dead!").formatted(Formatting.RED), true);
+                        return TypedActionResult.fail(mainHandStack);
+                    } else {
+                        //only runs if PlayerEntity is valid, and is in spectator mode
+                        user.setCurrentHand(hand);
+                        return TypedActionResult.consume(mainHandStack);
+                    }
+                }
+            } else return TypedActionResult.consume(mainHandStack);
         }
-        return ActionResult.FAIL;
+        //if player isn't looking at a block or the air, do nothing.
+        return TypedActionResult.pass(mainHandStack);
     }
 
     @Override
     public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-        if (!world.isClient() && user instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) user;
-            UUID deadPlayerUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
-            PlayerEntity playerToRevive = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, deadPlayerUUID);
-            if (playerToRevive == null) {
-                //handles if the uuid is null
-                player.sendMessage(Text.literal("Not bound or invalid player!"), true);
-                player.stopUsingItem();
-            } else if (!playerToRevive.isSpectator() && playerToRevive != null) {
-                //runs if player isnt in spectator
-                player.sendMessage(Text.literal("Player is not dead or not in spectator mode!"), true);
-                player.stopUsingItem();
-            } else if (remainingUseTicks >= 1) {
-                HitResult hitResult = this.getHitResult(user);
-                ((ServerWorld) world).spawnParticles(ParticleTypes.END_ROD, hitResult.getPos().x, hitResult.getPos().y + 1, hitResult.getPos().z, 1, 0.1, 0.5, 0.1, 0);
-                if (hitResult instanceof BlockHitResult && hitResult.getType() == HitResult.Type.BLOCK) {
+        HitResult hitResult = this.getHitResult(user);
+        if (hitResult.getType() == HitResult.Type.BLOCK) {
+            //only runs if the player is still looking at a block
+            if (user instanceof PlayerEntity && !world.isClient()) {
+                //only runs on the server side, and if the user is a player
+                UUID deadPlayerUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
+                if (remainingUseTicks >= 1) {
+                    //runs every tick to spawn particles
+                    ((ServerWorld) world).spawnParticles(ParticleTypes.END_ROD, hitResult.getPos().x, hitResult.getPos().y + 1, hitResult.getPos().z, 1, 0.1, 0.5, 0.1, 0);
                     if (remainingUseTicks == 1) {
-                        revivePlayer(world, deadPlayerUUID, user, hitResult);
+                        //runs the revive method
                         user.getMainHandStack().decrement(1);
+                        revivePlayer(world, deadPlayerUUID, user, hitResult);
                         user.stopUsingItem();
                     }
-                } else {
-                    user.stopUsingItem();
                 }
             }
-
-        } else {
-            user.stopUsingItem();
-        }
-
+        } else user.stopUsingItem();
     }
 
 
@@ -146,8 +146,9 @@ public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> too
             }
 
         } else {
-            tooltip.add(Text.literal("Will resurrect the bound player, and clear all stacks of Umbra Mortis.").formatted(Formatting.GRAY));
-            tooltip.add(Text.literal("Not Bound to a player").formatted(Formatting.GRAY));
+            tooltip.add(Text.literal("Will resurrect the bound player.").formatted(Formatting.GRAY));
+            tooltip.add(Text.literal("Removes all stacks of Umbra Mortis from the revived player.").formatted(Formatting.GRAY));
+            tooltip.add(Text.literal("Hold a blood vial in the offhand and use to bind.").formatted(Formatting.GRAY));
         }
     } else {
         tooltip.add(Text.literal("This item only works in hardcore mode!").formatted(Formatting.RED));
@@ -155,7 +156,6 @@ public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> too
 }
 private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUser, HitResult hitResult) {
     if (!world.isClient()) {
-        MinecraftServer server = world.getServer();
         ReviveState state = ReviveState.get((ServerWorld) world);
         ServerPlayerEntity playerToRevive = (ServerPlayerEntity) TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, deadPlayerUUID);
         World targetDimension = itemUser.getWorld();

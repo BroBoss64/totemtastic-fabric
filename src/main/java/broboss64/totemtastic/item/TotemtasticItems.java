@@ -3,7 +3,6 @@ package broboss64.totemtastic.item;
 import broboss64.totemtastic.Totemtastic;
 import broboss64.totemtastic.item.custom.*;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.minecraft.item.Item;
 import net.minecraft.item.SmithingTemplateItem;
 import net.minecraft.registry.Registries;
@@ -48,8 +47,5 @@ public class TotemtasticItems {
         return Registry.register(Registries.ITEM, new Identifier(Totemtastic.MOD_ID, name), item);
     }
 
-    public static void registerModItems() {
-
-    }
-
+    public static void registerModItems() {}
 }

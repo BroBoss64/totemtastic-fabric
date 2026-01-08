@@ -14,6 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
@@ -37,31 +38,23 @@ public class RecallTotemItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack heldStack = user.getStackInHand(hand);
+        ItemStack activeHandStack = user.getStackInHand(hand);
         if (!world.isClient()) {
-            if (hand == Hand.MAIN_HAND) {
-                //only runs if in main hand
-                if (user.isSneaking()) {
-                    //links the totem to the players current position
-                    TotemtasticUtils.createPositionLinkedTotem(user.getBlockPos(), world, user);
-                    int targetX = (int) user.getX();
-                    int targetY = (int) user.getY();
-                    int targetZ = (int) user.getZ();
-                    //informs the player of the change
-                    user.sendMessage(Text.literal("Bound to X: " + targetX + ", Y: " + targetY + ", Z: " + targetZ));
-                    user.stopUsingItem();
-                    return TypedActionResult.success(heldStack, true);
-                } else {
-                    //still dont know what this does
-                    user.setCurrentHand(hand);
-                }
-
+            if (user.isSneaking()) {
+                //binds totem to the players position
+                TotemtasticUtils.createPositionLinkedTotem(user.getBlockPos(), world, user);
+                int boundX = user.getBlockX();
+                int boundY = user.getBlockY();
+                int boundZ = user.getBlockZ();
+                //sends the player a message telling them where its bound
+                user.sendMessage(Text.literal("Bound to X: " + boundX + ", Y: " + boundY + ", Z: " + boundZ), true);
+                return TypedActionResult.success(activeHandStack, true);
             } else {
-                user.stopUsingItem();
-                return TypedActionResult.fail(heldStack);
+                //if not sneaking, do normal functionality
+                user.setCurrentHand(hand);
+                return TypedActionResult.consume(activeHandStack);
             }
-        }
-        return TypedActionResult.fail(heldStack);
+        } else return TypedActionResult.consume(activeHandStack);
     }
 
     @Override
@@ -99,7 +92,7 @@ public class RecallTotemItem extends Item {
                 targetWorld.playSoundFromEntity(null, user, SoundEvents.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.5f, 1);
                 user.getMainHandStack().decrement(1);
             } else {
-                user.sendMessage(Text.literal("Not bound or invalid position!"), true);
+                Totemtastic.LOGGER.error("Tried to teleport to an invalid position!");
             }
         }
     }
@@ -109,14 +102,14 @@ public class RecallTotemItem extends Item {
         NbtCompound nbt = stack.getNbt();
         if (nbt != null && nbt.contains(Totemtastic.POSITION_KEY)) {
             NbtCompound tooltipCoords = nbt.getCompound(Totemtastic.POSITION_KEY);
-            tooltip.add(Text.literal("§7X: " +
+            tooltip.add(Text.literal("X: " +
                     tooltipCoords.getInt("x") + ", Y: " +
                     tooltipCoords.getInt("y") + ", Z: " +
-                    tooltipCoords.getInt("z")));
-            tooltip.add(Text.literal("Dimension: " + tooltipCoords.getString("dimension")));
+                    tooltipCoords.getInt("z")).formatted(Formatting.GRAY));
+            tooltip.add(Text.literal("Dimension: " + tooltipCoords.getString("dimension").formatted(Formatting.GRAY)));
         } else {
-            tooltip.add(Text.literal("§7No Position Linked"));
-            tooltip.add(Text.literal("§7Sneak and use to link"));
+            tooltip.add(Text.literal("Teleports the user to the bound position").formatted(Formatting.GRAY));
+            tooltip.add(Text.literal("Sneak and use to bind.").formatted(Formatting.GRAY));
         }
     }
 

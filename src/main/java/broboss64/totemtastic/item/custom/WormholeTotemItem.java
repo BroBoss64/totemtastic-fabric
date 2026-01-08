@@ -12,6 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -41,52 +42,69 @@ public class WormholeTotemItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack heldStack = user.getStackInHand(hand);
+        ItemStack mainHandStack = user.getStackInHand(hand);
         if (!world.isClient()) {
-            if (hand == Hand.MAIN_HAND) {
-                //only triggers if in main hand
-                UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getMainHandStack());
-                if (totemUUID != null && user.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
-                    //i dont know what this does but its very important
-                    user.setCurrentHand(hand);
-                } else if (user.getOffHandStack().getItem() == TotemtasticItems.BLOOD_VIAL) {
-                    //binds it
-                    TotemtasticUtils.bindTotemFromVial(user);
-                    user.stopUsingItem();
-                } else {
-                    //cancels if bound uuid is missing or invalid
-                    user.sendMessage(Text.literal("Not bound or invalid player!"), true);
-                    user.stopUsingItem();
-                    return TypedActionResult.success(heldStack, true);
-                }
-
-            } else {
+            //only triggers if in main hand
+            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getMainHandStack());
+            PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, totemUUID);
+            if (user.getOffHandStack().getItem() == TotemtasticItems.BLOOD_VIAL) {
+                //handles binding of totem
+                UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getOffHandStack());
+                TotemtasticUtils.bindTotemFromVial(user);
+                String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
+                user.sendMessage(Text.literal("Bound to " + boundToName), true);
+                return TypedActionResult.consume(mainHandStack);
+            } else if (totemUUID == null) {
+                //handles null uuid
+                user.sendMessage(Text.literal("Not bound!").formatted(Formatting.RED), true);
                 user.stopUsingItem();
-                return TypedActionResult.fail(heldStack);
+                return TypedActionResult.fail(mainHandStack);
+            } else if (targetPlayer == null) {
+                //handles offline player
+                user.sendMessage(Text.literal("Target player is offline!").formatted(Formatting.RED), true);
+                user.stopUsingItem();
+                return TypedActionResult.fail(mainHandStack);
+            } else if (!targetPlayer.isAlive() || targetPlayer.isSpectator()) {
+                //handles dead players or ones in spectator
+                user.sendMessage(Text.literal("Target player is dead!").formatted(Formatting.RED), true);
+                user.stopUsingItem();
+                return TypedActionResult.fail(mainHandStack);
+            } else if (targetPlayer == user) {
+                //handles teleporting to yourself
+                user.sendMessage(Text.literal("You can't teleport to yourself!").formatted(Formatting.RED), true);
+                user.stopUsingItem();
+                return TypedActionResult.fail(mainHandStack);
+            } else {
+                //if no errors, run normally
+                user.setCurrentHand(hand);
+                return TypedActionResult.consume(mainHandStack);
             }
-
-
         }
-        return TypedActionResult.fail(heldStack);
+        return TypedActionResult.consume(mainHandStack);
     }
 
     @Override
     public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+        UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
         if (!world.isClient() && user instanceof  PlayerEntity) {
-            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
             PlayerEntity playerUsing = (PlayerEntity) user;
             ServerWorld serverWorld = (ServerWorld) world;
             PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, totemUUID);
-            if (remainingUseTicks >= 1 && !user.isSneaking() && user.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
+            if (remainingUseTicks >= 1 && user.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
                 //runs every tick
                 serverWorld.spawnParticles(ParticleTypes.PORTAL, user.getX(), user.getY() + 1, user.getZ(),
                         2, 0.25, 0.5, 0.25, 0.2);
+                if (remainingUseTicks == getMaxUseTime(stack)){
+                    //sends messages to both user and target
+                    playerUsing.sendMessage(Text.literal("Teleporting to " + targetPlayer.getName().getString() + ".").formatted(Formatting.AQUA));
+                    targetPlayer.sendMessage(Text.literal(playerUsing.getName().getString() + " is teleporting to you!").formatted(Formatting.AQUA), true);
+                }
                 if (targetPlayer != null) {
+                    //spawns particles around the targetPlayer
                     ServerWorld targetWorld = (ServerWorld) targetPlayer.getWorld();
                     targetWorld.spawnParticles(ParticleTypes.PORTAL, targetPlayer.getX(), targetPlayer.getY() + 1, targetPlayer.getZ(),
                             2, 0.25, 0.5, 0.25, 0.2);
                 }
-
                 if (remainingUseTicks == 1) {
                     //runs when finished using
                     warpToPlayer(world, playerUsing, totemUUID);
@@ -102,9 +120,7 @@ public class WormholeTotemItem extends Item {
     private void warpToPlayer(World world, PlayerEntity user, UUID targetUUID) {
         PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, targetUUID);
         if (targetPlayer != null) {
-            if (user == targetPlayer) {
-                user.sendMessage(Text.literal("You can't warp to yourself!"), true);
-            } else {
+            //teleports the user to the target player, and removes 1 totem (even though they only stack to 1)
                 ServerPlayerEntity serverUser = (ServerPlayerEntity) user;
                 World targetDimension = targetPlayer.getWorld();
                 double targetX = targetPlayer.getX();
@@ -112,11 +128,10 @@ public class WormholeTotemItem extends Item {
                 double targetZ = targetPlayer.getZ();
                 serverUser.teleport((ServerWorld) targetDimension, targetX, targetY, targetZ, targetPlayer.getYaw(), targetPlayer.getPitch());
                 targetDimension.playSoundFromEntity(null, user, SoundEvents.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.6f, 1);
-                user.getMainHandStack().decrement(1);
-            }
-
+                Hand activeHand = user.getActiveHand();
+                user.getStackInHand(activeHand).decrement(1);
         } else {
-            user.sendMessage(Text.literal("Invalid Player! Is the target online?"), true);
+            Totemtastic.LOGGER.error("Tried to teleport to an invalid player!");
         }
     }
 
@@ -130,12 +145,13 @@ public class WormholeTotemItem extends Item {
             if (entry != null) {
                 tooltip.add(Text.literal("Will warp to " + entry.getProfile().getName()).formatted(Formatting.GRAY));
             } else {
-                tooltip.add(Text.literal("Will warp to an Offline Player").formatted(Formatting.GRAY));
+                tooltip.add(Text.literal("Will warp to an offline player").formatted(Formatting.GRAY));
             }
 
         } else {
-            tooltip.add(Text.literal("§7Not bound to a player"));
-            tooltip.add(Text.literal("§7Hold a blood vial in the offhand and use to bind"));
+            //default tooltip
+            tooltip.add(Text.literal("Teleports the user to the bound player on use.").formatted(Formatting.GRAY));
+            tooltip.add(Text.literal("Hold a blood vial in the offhand and use to bind.").formatted(Formatting.GRAY));
         }
     }
 

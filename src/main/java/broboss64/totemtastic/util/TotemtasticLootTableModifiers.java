@@ -4,7 +4,6 @@ import broboss64.totemtastic.item.TotemtasticItems;
 import broboss64.totemtastic.util.loot.IsHardcoreLootCondition;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.minecraft.loot.LootPool;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.RandomChanceLootCondition;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.SetCountLootFunction;
