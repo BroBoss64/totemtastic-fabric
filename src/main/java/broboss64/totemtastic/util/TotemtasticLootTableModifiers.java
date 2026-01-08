@@ -31,15 +31,6 @@ public class TotemtasticLootTableModifiers {
                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());
                 builder.pool(poolBuilder.build());
             }
-            if (WOODLAND_MANSION_CHEST_ID.equals(identifier)) {
-                LootPool.Builder poolBuilder = LootPool.builder()
-                        .rolls(ConstantLootNumberProvider.create(1))
-                        .conditionally(IsHardcoreLootCondition::new)
-                        .conditionally(RandomChanceLootCondition.builder(0.2f))
-                        .with(ItemEntry.builder(TotemtasticItems.RESURRECTION_SMITHING_TEMPLATE))
-                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());
-                builder.pool(poolBuilder.build());
-            }
             if (FORTRESS_CHEST_ID.equals(identifier)) {
                 LootPool.Builder poolBuilder = LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1))
