@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "totemtastic:flint_knife",
+    "totemtastic:gold_knife",
+    "totemtastic:iron_knife",
+    "totemtastic:diamond_knife",
+    "totemtastic:netherite_knife"
+  ]
+}

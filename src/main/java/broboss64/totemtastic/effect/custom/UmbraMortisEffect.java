@@ -1,6 +1,7 @@
 package broboss64.totemtastic.effect.custom;
 
 import broboss64.totemtastic.Totemtastic;
+import broboss64.totemtastic.util.ReviveState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -8,6 +9,8 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.server.world.ServerWorld;
 
 import java.util.UUID;
 
@@ -39,9 +42,11 @@ public class UmbraMortisEffect extends StatusEffect {
 
     @Override
     public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
-        EntityAttributeInstance maxHealth = entity.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
-        if (maxHealth != null) {
-            maxHealth.removeModifier(healthReductionUUID);
+        if (!entity.getWorld().isClient()) {
+            EntityAttributeInstance maxHealth = entity.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+                if (maxHealth != null) {
+                    maxHealth.removeModifier(healthReductionUUID);
+                }
         }
     }
 }

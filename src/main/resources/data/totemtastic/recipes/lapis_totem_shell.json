@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "I I",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:lapis_lazuli"
+    }
+  },
+  "result": {
+    "item": "totemtastic:lapis_totem_shell"
+  }
+}

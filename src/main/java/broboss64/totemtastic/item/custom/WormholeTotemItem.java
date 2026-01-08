@@ -47,16 +47,8 @@ public class WormholeTotemItem extends Item {
                 //only triggers if in main hand
                 UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getMainHandStack());
                 if (totemUUID != null && user.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
-                    if (user.isSneaking()) {
-                        //shows bound player name
-                        String boundPlayerName = "This totem will warp to " + TotemtasticUtils.getUsernameFromUUID(totemUUID, world.getServer());
-                        user.sendMessage(Text.literal(boundPlayerName), true);
-                        user.stopUsingItem();
-                        return TypedActionResult.success(user.getMainHandStack(), true);
-                    } else {
-                        //i dont know what this does but its very important
-                        user.setCurrentHand(hand);
-                    }
+                    //i dont know what this does but its very important
+                    user.setCurrentHand(hand);
                 } else if (user.getOffHandStack().getItem() == TotemtasticItems.BLOOD_VIAL) {
                     //binds it
                     TotemtasticUtils.bindTotemFromVial(user);

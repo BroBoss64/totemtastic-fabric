@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "I I",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:quartz"
+    }
+  },
+  "result": {
+    "item": "totemtastic:quartz_totem_shell"
+  }
+}

@@ -29,8 +29,8 @@ import net.minecraft.world.World;
 public class KnifeItem extends Item {
     public static final RegistryKey<DamageType> STAB_SELF =
             RegistryKey.of(RegistryKeys.DAMAGE_TYPE, new Identifier(Totemtastic.MOD_ID, "stab_self"));
-    public static final RegistryKey<DamageType> STABBING =
-            RegistryKey.of(RegistryKeys.DAMAGE_TYPE, new Identifier(Totemtastic.MOD_ID, "stabbing"));
+    /*public static final RegistryKey<DamageType> STABBING =
+            RegistryKey.of(RegistryKeys.DAMAGE_TYPE, new Identifier(Totemtastic.MOD_ID, "stabbing"));*/
 
     private final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 

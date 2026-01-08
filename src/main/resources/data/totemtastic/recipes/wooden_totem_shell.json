@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "I I",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "result": {
+    "item": "totemtastic:wooden_totem_shell"
+  }
+}

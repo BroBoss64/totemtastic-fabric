@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BAB",
+    "AIA",
+    "BAB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:gold_ingot"
+    },
+    "A": {
+      "item": "minecraft:echo_shard"
+    },
+    "I": {
+      "item": "minecraft:emerald"
+    }
+  },
+  "result": {
+    "item": "totemtastic:undying_core"
+  }
+}

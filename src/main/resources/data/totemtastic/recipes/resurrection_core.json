@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BAB",
+    "AIA",
+    "BAB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:copper_ingot"
+    },
+    "A": {
+      "item": "redstone"
+    },
+    "I": {
+      "item": "totemtastic:blood_vial"
+    }
+  },
+  "result": {
+    "item": "totemtastic:resurrection_core"
+  }
+}

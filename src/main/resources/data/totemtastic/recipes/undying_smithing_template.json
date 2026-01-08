@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RTR",
+    "RBR",
+    "RRR"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:gold_block"
+    },
+    "R": {
+      "item": "minecraft:diamond"
+    },
+    "T": {
+      "item": "totemtastic:undying_smithing_template"
+    }
+  },
+  "result": {
+    "item": "totemtastic:undying_smithing_template"
+  }
+}

@@ -7,6 +7,7 @@ import broboss64.totemtastic.util.TotemtasticUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -53,14 +54,18 @@ public class CrudeResurrectionTotemItem extends Item {
         ItemStack heldStack = user.getStackInHand(hand);
         if (!world.isClient() && this.getHitResult(user).getType() != HitResult.Type.BLOCK) {
             if (user.getOffHandStack().getItem() == TotemtasticItems.BLOOD_VIAL) {
+                //grabs the uuid from the offhand, and binds the totem
                 TotemtasticUtils.bindTotemFromVial(user);
                 user.stopUsingItem();
             } else {
+                //if they don't have a blood vial in their offhand, do nothing
                 user.stopUsingItem();
                 return TypedActionResult.fail(heldStack);
             }
-
-        }
+        }/* else if (!world.isClient() && this.getHitResult(user).getType() == HitResult.Type.BLOCK) {
+            user.setCurrentHand(hand);
+            return TypedActionResult.consume(heldStack);
+        }*/
         return TypedActionResult.fail(heldStack);
     }
 
@@ -74,17 +79,17 @@ public class CrudeResurrectionTotemItem extends Item {
                 player.stopUsingItem();
                 player.sendMessage(Text.literal("Not bound or invalid player!"), true);
                 return ActionResult.FAIL;
-            } else if (!targetPlayer.isSpectator() || targetPlayer == null) {
+            } else if (targetPlayer == null || !targetPlayer.isSpectator()) {
                 player.stopUsingItem();
-                player.sendMessage(Text.literal("Player is not dead or offline!"), true);
+                player.sendMessage(Text.literal("Player is alive/offline!"), true);
                 return ActionResult.FAIL;
             } else if (this.getHitResult(player).getType() == HitResult.Type.BLOCK && player.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
                 player.setCurrentHand(context.getHand());
+                return ActionResult.SUCCESS;
             } else {
                 player.stopUsingItem();
                 return ActionResult.FAIL;
             }
-            return ActionResult.FAIL;
         }
         return ActionResult.FAIL;
     }
@@ -131,20 +136,28 @@ private HitResult getHitResult(LivingEntity user) {
 
 @Override
 public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-    NbtCompound nbt = stack.getNbt();
-    if (nbt != null && nbt.contains(Totemtastic.PLAYER_UUID_KEY)) {
-        UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
-        MinecraftClient client = MinecraftClient.getInstance();
-        PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
-        if (entry != null) {
-            tooltip.add(Text.literal("Will resurrect " + entry.getProfile().getName()).formatted(Formatting.GRAY));
-        } else {
-            tooltip.add(Text.literal("Will resurrect an Offline Player").formatted(Formatting.GRAY));
-        }
+    MinecraftClient client = MinecraftClient.getInstance();
+    ClientWorld clientWorld = client.world;
+    if (clientWorld.getLevelProperties().isHardcore()) {
+        NbtCompound nbt = stack.getNbt();
+        if (nbt != null && nbt.contains(Totemtastic.PLAYER_UUID_KEY)) {
+            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
+            PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
+            if (entry != null) {
+                tooltip.add(Text.literal("Will resurrect " + entry.getProfile().getName()).formatted(Formatting.GRAY));
+                tooltip.add(Text.literal("Will deal 10 hearts of damage to the user.").formatted(Formatting.DARK_RED));
+            } else {
+                tooltip.add(Text.literal("Bound to an offline player.").formatted(Formatting.GRAY));
+                tooltip.add(Text.literal("Will deal 10 hearts of damage to the user.").formatted(Formatting.DARK_RED));
+            }
 
+        } else {
+            tooltip.add(Text.literal("Will resurrect the bound player.").formatted(Formatting.GRAY));
+            tooltip.add(Text.literal("Applies a stacking 20% max health reduction to the revived player.").formatted(Formatting.DARK_RED));
+            tooltip.add(Text.literal("Not Bound to a player").formatted(Formatting.GRAY));
+        }
     } else {
-        tooltip.add(Text.literal("Will resurrect the bound player with a 20% max health reduction, and deals 10 hearts of damage to user."));
-        tooltip.add(Text.literal("Not Bound to a player").formatted(Formatting.GRAY));
+        tooltip.add(Text.literal("This item only works in hardcore mode!").formatted(Formatting.RED));
     }
 }
 private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUser, HitResult hitResult) {
@@ -168,7 +181,6 @@ private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUse
         playerToRevive.sendMessage(Text.literal(String.valueOf(newReviveCount)));
         world.playSoundFromEntity(null, playerToRevive, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1, 1);
         ((ServerWorld) world).spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, targetX, targetY + 1, targetZ, 100, 0, 0, 0, 1);
-        playerToRevive.addStatusEffect(effect);
         //damages the user, killing them unless they have absorption or bonus health
         itemUser.damage(world.getDamageSources().magic(), 20);
     }

@@ -7,6 +7,7 @@ import broboss64.totemtastic.util.TotemtasticUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -130,20 +131,26 @@ private HitResult getHitResult(LivingEntity user) {
 @Override
 public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
     NbtCompound nbt = stack.getNbt();
-    if (nbt != null && nbt.contains(Totemtastic.PLAYER_UUID_KEY)) {
-        UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
-        MinecraftClient client = MinecraftClient.getInstance();
-        PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
-        if (entry != null) {
-            tooltip.add(Text.literal("Will resurrect " + entry.getProfile().getName()).formatted(Formatting.GRAY));
-        } else {
-            tooltip.add(Text.literal("Will resurrect an Offline Player").formatted(Formatting.GRAY));
-        }
+    MinecraftClient client = MinecraftClient.getInstance();
+    ClientWorld clientWorld = client.world;
+    if (clientWorld.getLevelProperties().isHardcore()) {
+        if (nbt != null && nbt.contains(Totemtastic.PLAYER_UUID_KEY)) {
+            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
+            PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
+            if (entry != null) {
+                tooltip.add(Text.literal("Will resurrect " + entry.getProfile().getName()).formatted(Formatting.GRAY));
+                tooltip.add(Text.literal("Will deal 10 hearts of damage to user.").formatted(Formatting.DARK_RED));
+            } else {
+                tooltip.add(Text.literal("Will resurrect an Offline Player").formatted(Formatting.GRAY));
+                tooltip.add(Text.literal("Will deal 10 hearts of damage to user.").formatted(Formatting.DARK_RED));
+            }
 
+        } else {
+            tooltip.add(Text.literal("Will resurrect the bound player, and clear all stacks of Umbra Mortis.").formatted(Formatting.GRAY));
+            tooltip.add(Text.literal("Not Bound to a player").formatted(Formatting.GRAY));
+        }
     } else {
-        tooltip.add(Text.literal("Will resurrect the bound player, and deals 10 hearts of damage to user.").formatted(Formatting.GRAY));
-        tooltip.add(Text.literal("Will also remove all stacks of Umbra Mortis from the revived player").formatted(Formatting.GRAY));
-        tooltip.add(Text.literal("Not Bound to a player").formatted(Formatting.GRAY));
+        tooltip.add(Text.literal("This item only works in hardcore mode!").formatted(Formatting.RED));
     }
 }
 private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUser, HitResult hitResult) {
@@ -160,6 +167,7 @@ private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUse
         playerToRevive.changeGameMode(GameMode.SURVIVAL);
         playerToRevive.setHealth(1);
         state.setReviveCount(deadPlayerUUID, 0);
+        playerToRevive.removeStatusEffect(Totemtastic.UMBRA_MORTIS);
         int currentReviveCount = state.getReviveCount(deadPlayerUUID);
         playerToRevive.sendMessage(Text.literal(String.valueOf(currentReviveCount)));
         world.playSoundFromEntity(null, playerToRevive, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1, 1);

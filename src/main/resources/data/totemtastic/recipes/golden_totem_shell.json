@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "I I",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result": {
+    "item": "totemtastic:golden_totem_shell"
+  }
+}
