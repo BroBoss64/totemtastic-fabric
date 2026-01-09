@@ -12,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -42,45 +41,47 @@ public class WormholeTotemItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack mainHandStack = user.getStackInHand(hand);
+        ItemStack activeHandStack = user.getStackInHand(hand);
+        ItemStack mainHandStack = user.getMainHandStack();
+        ItemStack offHandStack = user.getOffHandStack();
         if (!world.isClient()) {
             //only triggers if in main hand
-            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getMainHandStack());
+            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(activeHandStack);
             PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, totemUUID);
-            if (user.getOffHandStack().getItem() == TotemtasticItems.BLOOD_VIAL) {
+            if (offHandStack.getItem() == TotemtasticItems.BLOOD_VIAL) {
                 //handles binding of totem
-                UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getOffHandStack());
+                UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(offHandStack);
                 TotemtasticUtils.bindTotemFromVial(user);
                 String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
                 user.sendMessage(Text.literal("Bound to " + boundToName), true);
-                return TypedActionResult.consume(mainHandStack);
+                return TypedActionResult.consume(activeHandStack);
             } else if (totemUUID == null) {
                 //handles null uuid
                 user.sendMessage(Text.literal("Not bound!").formatted(Formatting.RED), true);
                 user.stopUsingItem();
-                return TypedActionResult.fail(mainHandStack);
+                return TypedActionResult.fail(activeHandStack);
             } else if (targetPlayer == null) {
                 //handles offline player
                 user.sendMessage(Text.literal("Target player is offline!").formatted(Formatting.RED), true);
                 user.stopUsingItem();
-                return TypedActionResult.fail(mainHandStack);
+                return TypedActionResult.fail(activeHandStack);
             } else if (!targetPlayer.isAlive() || targetPlayer.isSpectator()) {
                 //handles dead players or ones in spectator
                 user.sendMessage(Text.literal("Target player is dead!").formatted(Formatting.RED), true);
                 user.stopUsingItem();
-                return TypedActionResult.fail(mainHandStack);
+                return TypedActionResult.fail(activeHandStack);
             } else if (targetPlayer == user) {
                 //handles teleporting to yourself
                 user.sendMessage(Text.literal("You can't teleport to yourself!").formatted(Formatting.RED), true);
                 user.stopUsingItem();
-                return TypedActionResult.fail(mainHandStack);
+                return TypedActionResult.fail(activeHandStack);
             } else {
                 //if no errors, run normally
                 user.setCurrentHand(hand);
-                return TypedActionResult.consume(mainHandStack);
+                return TypedActionResult.consume(activeHandStack);
             }
         }
-        return TypedActionResult.consume(mainHandStack);
+        return TypedActionResult.consume(activeHandStack);
     }
 
     @Override
@@ -130,6 +131,7 @@ public class WormholeTotemItem extends Item {
                 targetDimension.playSoundFromEntity(null, user, SoundEvents.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.6f, 1);
                 Hand activeHand = user.getActiveHand();
                 user.getStackInHand(activeHand).decrement(1);
+                user.stopUsingItem();
         } else {
             Totemtastic.LOGGER.error("Tried to teleport to an invalid player!");
         }

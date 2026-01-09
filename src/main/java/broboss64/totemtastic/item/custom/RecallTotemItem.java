@@ -90,7 +90,7 @@ public class RecallTotemItem extends Item {
             if (targetWorld != null && targetPos != null) {
                 serverUser.teleport(targetWorld, targetPos.getX() + 0.5, targetPos.getY(), targetPos.getZ() + 0.5, user.getYaw(), user.getPitch());
                 targetWorld.playSoundFromEntity(null, user, SoundEvents.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.5f, 1);
-                user.getMainHandStack().decrement(1);
+                stack.decrement(1);
             } else {
                 Totemtastic.LOGGER.error("Tried to teleport to an invalid position!");
             }

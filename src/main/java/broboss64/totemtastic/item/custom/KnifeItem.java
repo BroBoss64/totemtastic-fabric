@@ -34,21 +34,36 @@ public class KnifeItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        ItemStack mainHandItem = player.getMainHandStack();
+        ItemStack activeHandStack = player.getStackInHand(hand);
         if (!world.isClient) {
            DamageSource damageSource = new DamageSource(world.getRegistryManager()
                    .get(RegistryKeys.DAMAGE_TYPE).entryOf(STAB_SELF));
-
            player.damage(damageSource, 4);
            world.playSoundFromEntity(null, player, SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1, 1);
            fillBloodVial(world, player, hand);
        }
-       return TypedActionResult.success(mainHandItem, true);
+       return TypedActionResult.success(activeHandStack, true);
     }
 
     private void fillBloodVial(World world, PlayerEntity player, Hand hand) {
-        ItemStack offHandItem = player.getOffHandStack();
-        if (offHandItem.getItem() == TotemtasticItems.GLASS_VIAL) {
+        ItemStack activeHandStack = player.getStackInHand(hand);
+        ItemStack offHandStack = player.getOffHandStack();
+        if (offHandStack.getItem() == TotemtasticItems.GLASS_VIAL) {
+            //checks if the item in the offhand is a glass vial
+            ItemStack newBloodVial = TotemtasticUtils.createBoundItemStack(TotemtasticItems.BLOOD_VIAL, 1, player.getUuid());
+            if (offHandStack.getCount() == 1) {
+                //makes the vial appear in their offhand if they only have one
+                player.setStackInHand(Hand.OFF_HAND, newBloodVial);
+            } else {
+                //otherwise just give them the stack
+                player.giveItemStack(newBloodVial);
+                offHandStack.decrement(1);
+            }
+            world.playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1, 1);
+        }
+        //does nothing if not a glass vial
+
+        /*if (offHandItem.getItem() == TotemtasticItems.GLASS_VIAL) {
             ItemStack bloodVial = TotemtasticUtils.createBoundItemStack(
                     TotemtasticItems.BLOOD_VIAL, 1, player.getUuid());
             if (offHandItem.getCount() == 1) {
@@ -58,7 +73,7 @@ public class KnifeItem extends Item {
                 player.setStackInHand(Hand.OFF_HAND, new ItemStack(offHandItem.getItem(), offHandItem.getCount() - 1));
             }
             world.playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1, 1);
-        }
+        }*/
     }
 
     public KnifeItem(Settings settings, float attackDamage, float attackSpeed) {

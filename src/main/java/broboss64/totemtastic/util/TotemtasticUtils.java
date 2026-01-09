@@ -2,6 +2,7 @@ package broboss64.totemtastic.util;
 
 import broboss64.totemtastic.Totemtastic;
 import broboss64.totemtastic.item.TotemtasticItems;
+import broboss64.totemtastic.item.custom.TotemShellItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,7 +38,8 @@ public class TotemtasticUtils {
         RegistryKey<World> worldKey = world.getRegistryKey();
         Identifier dimID = worldKey.getValue();
         //adds the nbt to the totem ONLY CALL WHEN TOTEM IS IN MAIN HAND
-        ItemStack totem = player.getMainHandStack();
+        Hand hand = player.getActiveHand();
+        ItemStack totem = player.getStackInHand(hand);
         NbtCompound nbt = totem.getOrCreateNbt();
         NbtCompound coordsTag = new NbtCompound();
         //puts the nbt onto the item
@@ -46,7 +48,7 @@ public class TotemtasticUtils {
         coordsTag.putInt("z", blockPos.getZ());
         coordsTag.putString("dimension", dimID.toString());
         nbt.put(Totemtastic.POSITION_KEY, coordsTag);
-        player.setStackInHand(Hand.MAIN_HAND, totem);
+        player.setStackInHand(hand, totem);
         world.playSoundFromEntity(null, player, SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1, 1);
     }
 
@@ -92,6 +94,7 @@ public class TotemtasticUtils {
     }
 
     public static String getUsernameFromUUID(UUID playerUUID, MinecraftServer server) {
+        //ONLY CALL ON SERVER SIDE
         ServerPlayerEntity player = server.getPlayerManager().getPlayer(playerUUID);
         if (player != null) {
             return player.getName().getString();
@@ -100,17 +103,26 @@ public class TotemtasticUtils {
         }
     }
     public static PlayerEntity getPlayerEntityFromUUID(ServerWorld world, UUID uuid) {
+        //ONLY CALL ON SERVER SIDE
         return world.getServer().getPlayerManager().getPlayer(uuid);
     }
 
     public static void bindTotemFromVial(PlayerEntity player) {
         if (!player.getWorld().isClient()) {
-            //gets the UUID from the blood vial and sets the main hand item to the new tagged item
-            UUID bloodVialUUID = fetchUUIDFromItemStack(player.getOffHandStack());
-            ItemStack taggedStack = createBoundItemStack(player.getMainHandStack().getItem(), 1, bloodVialUUID);
-            player.getInventory().offHand.set(0, new ItemStack(TotemtasticItems.GLASS_VIAL));
-            player.getInventory().setStack(player.getInventory().selectedSlot, taggedStack);
-            player.getWorld().playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1, 1);
+            Hand hand = player.getActiveHand();
+            ItemStack mainHandStack = player.getMainHandStack();
+            ItemStack offHandStack = player.getOffHandStack();
+            if (offHandStack.getItem() == TotemtasticItems.BLOOD_VIAL) {
+                    //safeguard to make sure we never modify the wrong item stack
+                    //gets the UUID from the blood vial and sets the main hand item to the new tagged item
+                    UUID bloodVialUUID = fetchUUIDFromItemStack(offHandStack);
+                    ItemStack taggedStack = createBoundItemStack(mainHandStack.getItem(), 1, bloodVialUUID);
+                    player.getInventory().offHand.set(0, new ItemStack(TotemtasticItems.GLASS_VIAL));
+                    player.getInventory().setStack(player.getInventory().selectedSlot, taggedStack);
+                    player.getWorld().playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1, 1);
+            } else {
+                Totemtastic.LOGGER.error("Offhand item is not a blood vial!");
+            }
         }
     }
 }
