@@ -17,7 +17,7 @@ public class TotemShellItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.literal("An empty shell waiting for a core.").formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("item.totemtastic.totem_shells.desc").formatted(Formatting.GRAY));
         super.appendTooltip(stack, world, tooltip, context);
     }
 }

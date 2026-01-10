@@ -113,6 +113,7 @@ public class TotemtasticUtils {
             ItemStack mainHandStack = player.getMainHandStack();
             ItemStack offHandStack = player.getOffHandStack();
             if (offHandStack.getItem() == TotemtasticItems.BLOOD_VIAL) {
+                if (mainHandStack.isIn(TotemtasticTags.Items.BLOOD_VIAL_TOTEMS)) {
                     //safeguard to make sure we never modify the wrong item stack
                     //gets the UUID from the blood vial and sets the main hand item to the new tagged item
                     UUID bloodVialUUID = fetchUUIDFromItemStack(offHandStack);
@@ -120,6 +121,9 @@ public class TotemtasticUtils {
                     player.getInventory().offHand.set(0, new ItemStack(TotemtasticItems.GLASS_VIAL));
                     player.getInventory().setStack(player.getInventory().selectedSlot, taggedStack);
                     player.getWorld().playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1, 1);
+                } else {
+                    Totemtastic.LOGGER.error("Main hand stack cannot be bound using a blood vial!");
+                }
             } else {
                 Totemtastic.LOGGER.error("Offhand item is not a blood vial!");
             }

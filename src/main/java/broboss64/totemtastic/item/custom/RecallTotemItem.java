@@ -40,6 +40,10 @@ public class RecallTotemItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack activeHandStack = user.getStackInHand(hand);
         if (!world.isClient()) {
+            if (Totemtastic.CONFIG.recallTotemDisabled) {
+                user.sendMessage(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED));
+                return TypedActionResult.pass(activeHandStack);
+            }
             if (user.isSneaking()) {
                 //binds totem to the players position
                 TotemtasticUtils.createPositionLinkedTotem(user.getBlockPos(), world, user);
@@ -47,7 +51,7 @@ public class RecallTotemItem extends Item {
                 int boundY = user.getBlockY();
                 int boundZ = user.getBlockZ();
                 //sends the player a message telling them where its bound
-                user.sendMessage(Text.literal("Bound to X: " + boundX + ", Y: " + boundY + ", Z: " + boundZ), true);
+                user.sendMessage(Text.literal("Bound to X: " + boundX + ", Y: " + boundY + ", Z: " + boundZ).formatted(Formatting.AQUA), true);
                 return TypedActionResult.success(activeHandStack, true);
             } else {
                 //if not sneaking, do normal functionality
@@ -108,8 +112,8 @@ public class RecallTotemItem extends Item {
                     tooltipCoords.getInt("z")).formatted(Formatting.GRAY));
             tooltip.add(Text.literal("Dimension: " + tooltipCoords.getString("dimension").formatted(Formatting.GRAY)));
         } else {
-            tooltip.add(Text.literal("Teleports the user to the bound position").formatted(Formatting.GRAY));
-            tooltip.add(Text.literal("Sneak and use to bind.").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("tooltip.totemtastic.recall_totem.info").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("tooltip.totemtastic.sneak_use").formatted(Formatting.GRAY));
         }
     }
 

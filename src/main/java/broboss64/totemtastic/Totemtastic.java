@@ -62,19 +62,21 @@ public class Totemtastic implements ModInitializer {
         TotemtasticLootConditions.register();
 
         //umbra mortis reapplier method
-        ServerTickEvents.END_SERVER_TICK.register(minecraftServer -> {
-            for (ServerPlayerEntity player : minecraftServer.getPlayerManager().getPlayerList()) {
-                ReviveState state = ReviveState.get(player.getServerWorld());
-                int reviveCount = state.getReviveCount(player.getUuid());
-                if (reviveCount <= 0) continue;
-                if (!player.isAlive()) {
-                    player.removeStatusEffect(Totemtastic.UMBRA_MORTIS);
-                    continue;
+        if (!CONFIG.umbraMortisDisabled) {
+            ServerTickEvents.END_SERVER_TICK.register(minecraftServer -> {
+                for (ServerPlayerEntity player : minecraftServer.getPlayerManager().getPlayerList()) {
+                    ReviveState state = ReviveState.get(player.getServerWorld());
+                    int reviveCount = state.getReviveCount(player.getUuid());
+                    if (reviveCount <= 0) continue;
+                    if (!player.isAlive()) {
+                        player.removeStatusEffect(Totemtastic.UMBRA_MORTIS);
+                        continue;
+                    }
+                    if (player.hasStatusEffect(Totemtastic.UMBRA_MORTIS)) continue;
+                    player.addStatusEffect(new StatusEffectInstance(Totemtastic.UMBRA_MORTIS, Integer.MAX_VALUE,
+                            reviveCount - 1, true, false, false));
                 }
-                if (player.hasStatusEffect(Totemtastic.UMBRA_MORTIS)) continue;
-                player.addStatusEffect(new StatusEffectInstance(Totemtastic.UMBRA_MORTIS, Integer.MAX_VALUE,
-                        reviveCount - 1, true, false, false));
-            }
-        });
-	}
+            });
+        }
+    }
 }

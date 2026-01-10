@@ -4,6 +4,7 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +17,7 @@ public class UndyingCoreItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.of("§7You feel safe with this in your hand."));
+        tooltip.add(Text.translatable("item.totemtastic.undying_core.desc").formatted(Formatting.GRAY));
         super.appendTooltip(stack, world, tooltip, context);
     }
 }

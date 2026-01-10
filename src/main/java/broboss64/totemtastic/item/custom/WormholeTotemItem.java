@@ -53,26 +53,26 @@ public class WormholeTotemItem extends Item {
                 UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(offHandStack);
                 TotemtasticUtils.bindTotemFromVial(user);
                 String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
-                user.sendMessage(Text.literal("Bound to " + boundToName), true);
+                user.sendMessage(Text.translatable("tooltip.totemtastic.bound_to_prefix", boundToName), true);
                 return TypedActionResult.consume(activeHandStack);
             } else if (totemUUID == null) {
                 //handles null uuid
-                user.sendMessage(Text.literal("Not bound!").formatted(Formatting.RED), true);
+                user.sendMessage(Text.translatable("tooltip.totemtastic.not_bound").formatted(Formatting.RED), true);
                 user.stopUsingItem();
                 return TypedActionResult.fail(activeHandStack);
             } else if (targetPlayer == null) {
                 //handles offline player
-                user.sendMessage(Text.literal("Target player is offline!").formatted(Formatting.RED), true);
+                user.sendMessage(Text.translatable("tooltip.totemtastic.player_offline").formatted(Formatting.RED), true);
                 user.stopUsingItem();
                 return TypedActionResult.fail(activeHandStack);
             } else if (!targetPlayer.isAlive() || targetPlayer.isSpectator()) {
                 //handles dead players or ones in spectator
-                user.sendMessage(Text.literal("Target player is dead!").formatted(Formatting.RED), true);
+                user.sendMessage(Text.translatable("tooltip.totemtastic.dead").formatted(Formatting.RED), true);
                 user.stopUsingItem();
                 return TypedActionResult.fail(activeHandStack);
             } else if (targetPlayer == user) {
                 //handles teleporting to yourself
-                user.sendMessage(Text.literal("You can't teleport to yourself!").formatted(Formatting.RED), true);
+                user.sendMessage(Text.translatable("tooltip.totemtastic.self_teleport").formatted(Formatting.RED), true);
                 user.stopUsingItem();
                 return TypedActionResult.fail(activeHandStack);
             } else {
@@ -97,8 +97,8 @@ public class WormholeTotemItem extends Item {
                         2, 0.25, 0.5, 0.25, 0.2);
                 if (remainingUseTicks == getMaxUseTime(stack)){
                     //sends messages to both user and target
-                    playerUsing.sendMessage(Text.literal("Teleporting to " + targetPlayer.getName().getString() + ".").formatted(Formatting.AQUA));
-                    targetPlayer.sendMessage(Text.literal(playerUsing.getName().getString() + " is teleporting to you!").formatted(Formatting.AQUA), true);
+                    playerUsing.sendMessage(Text.translatable("tooltip.totemtastic.teleporting_to_prefix", targetPlayer.getName().getString()).formatted(Formatting.AQUA));
+                    targetPlayer.sendMessage(Text.translatable("tooltip.totemtastic.teleported_to_suffix", user.getName().getString()).formatted(Formatting.AQUA), true);
                 }
                 if (targetPlayer != null) {
                     //spawns particles around the targetPlayer
@@ -145,15 +145,15 @@ public class WormholeTotemItem extends Item {
             MinecraftClient client = MinecraftClient.getInstance();
             PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
             if (entry != null) {
-                tooltip.add(Text.literal("Will warp to " + entry.getProfile().getName()).formatted(Formatting.GRAY));
+                tooltip.add(Text.translatable("tooltip.totemtastic.warp_to_prefix", entry.getProfile().getName()).formatted(Formatting.GRAY));
             } else {
-                tooltip.add(Text.literal("Will warp to an offline player").formatted(Formatting.GRAY));
+                tooltip.add(Text.translatable("tooltip.totemtastic.warp_to_prefix", "an offline player").formatted(Formatting.GRAY));
             }
 
         } else {
             //default tooltip
-            tooltip.add(Text.literal("Teleports the user to the bound player on use.").formatted(Formatting.GRAY));
-            tooltip.add(Text.literal("Hold a blood vial in the offhand and use to bind.").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("item.totemtastic.wormhole_totem.desc").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("tooltip.totemtastic.blood_vial_use").formatted(Formatting.GRAY));
         }
     }
 

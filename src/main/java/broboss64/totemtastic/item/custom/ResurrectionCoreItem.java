@@ -17,7 +17,7 @@ public class ResurrectionCoreItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.literal("Your hand goes numb when holding it.").formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("item.totemtastic.resurrection_core.desc").formatted(Formatting.GRAY));
         super.appendTooltip(stack, world, tooltip, context);
     }
 }

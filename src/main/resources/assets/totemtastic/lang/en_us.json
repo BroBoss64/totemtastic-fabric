@@ -5,15 +5,26 @@
   "item.totemtastic.golden_totem_shell": "Golden Totem Shell",
   "item.totemtastic.quartz_totem_shell": "Quartz Totem Shell",
   "item.totemtastic.lapis_totem_shell": "Lapis Totem Shell",
+  "item.totemtastic.totem_shells.desc": "An empty shell waiting for a core.",
 
   "item.totemtastic.resurrection_core": "Resurrection Core",
+  "item.totemtastic.resurrection_core.desc": "Your hand goes numb when holding it.",
   "item.totemtastic.teleportation_core": "Teleportation Core",
+  "item.totemtastic.teleportation_core.desc": "It's trying to teleport away.",
   "item.totemtastic.undying_core": "Undying Core",
+  "item.totemtastic.undying_core.desc": "You feel safe when holding this.",
 
   "item.totemtastic.crude_resurrection_totem": "Crude Totem of Resurrection",
+  "item.totemtastic.crude_resurrection_totem.desc": "Applies a stacking 20% max health reduction to the resurrected player.",
   "item.totemtastic.resurrection_totem": "Totem of Resurrection",
+  "item.totemtastic.resurrection_totem.desc": "Clears all stacks of Umbra Mortis from the revived player.",
+  "item.totemtastic.resurrection.desc": "Resurrects the bound player.",
+  "item.totemtastic.resurrection.warning": "Will deal 10 hearts of damage to the user.",
+
   "item.totemtastic.wormhole_totem": "Wormhole Totem",
+  "item.totemtastic.wormhole_totem.desc": "",
   "item.totemtastic.recall_totem": "Recall Totem",
+  "item.totemtastic.recall_totem.desc": "Teleports the user to the bound position.",
 
   "item.totemtastic.glass_vial": "Glass Vial",
   "item.totemtastic.blood_vial": "Blood Vial",
@@ -28,6 +39,19 @@
 
   "death.attack.stab_self": "%s stabbed themself",
   "death.attack.stab_self.player": "%s stabbed themselves while trying to escape %s",
-  "death.attack.stabbing": "%1$s was stabbed.",
-  "death.attack.stabbing.player": "%1$s was stabbed by %2$s"
+
+  "tooltip.totemtastic.item_disabled": "The server has disabled this item!",
+  "tooltip.totemtastic.sneak_use": "Sneak and use to bind.",
+  "tooltip.totemtastic.blood_vial_use": "Hold a blood vial in the offhand and use to bind.",
+  "tooltip.totemtastic.hardcore_only": "This item only works in hardcore mode!",
+  "tooltip.totemtastic.bound_to_prefix": "Bound to %s.",
+  "tooltip.totemtastic.will_resurrect_prefix": "Will resurrect %s.",
+  "tooltip.totemtastic.warp_to_prefix": "Will warp to %s.",
+  "tooltip.totemtastic.not_bound": "Not bound!",
+  "tooltip.totemtastic.player_offline": "Player is offline!",
+  "tooltip.totemtastic.not_dead": "Player is not dead!",
+  "tooltip.totemtastic.dead": "Player is dead!",
+  "tooltip.totemtastic.self_teleport": "You can't teleport to yourself!",
+  "tooltip.totemtastic.teleporting_to_prefix": "Teleporting to %s.",
+  "tooltip.totemtastic.teleported_to_suffix": "%s is teleporting to you!"
 }

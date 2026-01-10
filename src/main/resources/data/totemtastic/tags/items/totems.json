@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "totemtastic:crude_resurrection_totem",
+    "totemtastic:resurrection_totem",
+    "totemtastic:wormhole_totem",
+    "totemtastic:recall_totem",
+    "minecraft:totem_of_undying"
+  ]
+}

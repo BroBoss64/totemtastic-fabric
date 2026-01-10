@@ -51,11 +51,11 @@ public class ResurrectionTotemItem extends Item {
         ItemStack activeHandStack = user.getStackInHand(hand);
         ItemStack offHandStack = user.getOffHandStack();
         if  (!world.getLevelProperties().isHardcore()) {
-            user.sendMessage(Text.literal("This item only works in hardcore worlds!").formatted(Formatting.RED), true);
+            user.sendMessage(Text.translatable("tooltip.totemtastic.hardcore_only").formatted(Formatting.RED), true);
             return TypedActionResult.fail(activeHandStack);
         }
         if  (world.isClient() && TotemtasticClientSyncedConfig.resurrectionTotemDisabled) {
-            user.sendMessage(Text.literal("The server has disabled this item!").formatted(Formatting.RED), true);
+            user.sendMessage(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED), true);
             return TypedActionResult.fail(activeHandStack);
         }
         if (this.getHitResult(user).getType() == HitResult.Type.MISS) {
@@ -66,7 +66,7 @@ public class ResurrectionTotemItem extends Item {
                     UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getOffHandStack());
                     TotemtasticUtils.bindTotemFromVial(user);
                     String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
-                    user.sendMessage(Text.literal("Bound to " + boundToName), true);
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.bound_to_prefix", boundToName), true);
                     return TypedActionResult.consume(activeHandStack);
                 }
             } else {
@@ -82,21 +82,21 @@ public class ResurrectionTotemItem extends Item {
                     UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(user.getOffHandStack());
                     TotemtasticUtils.bindTotemFromVial(user);
                     String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
-                    user.sendMessage(Text.literal("Bound to " + boundToName), true);
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.bound_to_prefix", boundToName), true);
                     return TypedActionResult.success(activeHandStack);
                 } else if (targetUUID == null) {
                     //handles null UUID
-                    user.sendMessage(Text.literal("Not Bound!").formatted(Formatting.RED), true);
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.not_bound").formatted(Formatting.RED), true);
                     return TypedActionResult.fail(activeHandStack);
                 } else {
                     PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, targetUUID);
                     if (targetPlayer == null) {
                         //if PlayerEntity doesn't exist, cancel usage
-                        user.sendMessage(Text.literal("Player is offline!").formatted(Formatting.RED), true);
+                        user.sendMessage(Text.translatable("tooltip.totemtastic.player_offline").formatted(Formatting.RED), true);
                         return TypedActionResult.fail(activeHandStack);
                     } else if (!targetPlayer.isSpectator()) {
                         //if player isn't in spectator mode, cancel usage
-                        user.sendMessage(Text.literal("Player is not dead!").formatted(Formatting.RED), true);
+                        user.sendMessage(Text.translatable("tooltip.totemtastic.not_dead").formatted(Formatting.RED), true);
                         return TypedActionResult.fail(activeHandStack);
                     } else {
                         //only runs if PlayerEntity is valid, and is in spectator mode
@@ -153,23 +153,23 @@ private HitResult getHitResult(LivingEntity user) {
                     UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
                     PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
                     if (entry != null) {
-                        tooltip.add(Text.literal("Will resurrect " + entry.getProfile().getName()).formatted(Formatting.GRAY));
-                        tooltip.add(Text.literal("Will deal 10 hearts of damage to the user.").formatted(Formatting.DARK_RED));
+                        tooltip.add(Text.translatable("tooltip.totemtastic.will_resurrect_prefix", entry.getProfile().getName()).formatted(Formatting.GRAY));
+                        tooltip.add(Text.translatable("item.totemtastic.resurrection.warning").formatted(Formatting.DARK_RED));
                     } else {
-                        tooltip.add(Text.literal("Bound to an offline player.").formatted(Formatting.GRAY));
-                        tooltip.add(Text.literal("Will deal 10 hearts of damage to the user.").formatted(Formatting.DARK_RED));
+                        tooltip.add(Text.translatable("tooltip.totemtastic.will_resurrect_prefix", "an offline player.").formatted(Formatting.GRAY));
+                        tooltip.add(Text.translatable("item.totemtastic.resurrection.warning").formatted(Formatting.DARK_RED));
                     }
 
                 } else {
-                    tooltip.add(Text.literal("Will resurrect the bound player.").formatted(Formatting.GRAY));
-                    tooltip.add(Text.literal("Clears all stacks of Umbra Mortis from the revived player.").formatted(Formatting.AQUA));
-                    tooltip.add(Text.literal("Hold a blood vial in the offhand and use to bind.").formatted(Formatting.GRAY));
+                    tooltip.add(Text.translatable("item.totemtastic.resurrection.desc").formatted(Formatting.GRAY));
+                    tooltip.add(Text.translatable("item.totemtastic.resurrection_totem.desc").formatted(Formatting.AQUA));
+                    tooltip.add(Text.translatable("tooltip.totemtastic.blood_vial_use").formatted(Formatting.GRAY));
                 }
             } else {
-                tooltip.add(Text.literal("The server has disabled this item!").formatted(Formatting.RED));
+                tooltip.add(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED));
             }
         } else {
-            tooltip.add(Text.literal("This item only works in hardcore mode!").formatted(Formatting.RED));
+            tooltip.add(Text.translatable("tooltip.totemtastic.hardcore_only").formatted(Formatting.RED));
         }
     }
     private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUser, HitResult hitResult) {
@@ -188,7 +188,7 @@ private HitResult getHitResult(LivingEntity user) {
             playerToRevive.removeStatusEffect(Totemtastic.UMBRA_MORTIS);
             state.setReviveCount(deadPlayerUUID,0);
             int newReviveCount = state.getReviveCount(deadPlayerUUID);
-            if (Totemtastic.CONFIG.devMode) Totemtastic.LOGGER.info("Player's new reviveCount = " + newReviveCount);
+            if (Totemtastic.CONFIG.devMode) Totemtastic.LOGGER.info(playerToRevive.getName().getString() + "'s new reviveCount = " + newReviveCount);
             ((ServerWorld) world).spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, blockX + 0.5, blockY + 1, blockZ + 0.5, 100, 0, 0, 0, 1);
             world.playSoundFromEntity(null, playerToRevive, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1, 1);
             //damages the user, killing them unless they have absorption or bonus health

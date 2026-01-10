@@ -62,18 +62,6 @@ public class KnifeItem extends Item {
             world.playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1, 1);
         }
         //does nothing if not a glass vial
-
-        /*if (offHandItem.getItem() == TotemtasticItems.GLASS_VIAL) {
-            ItemStack bloodVial = TotemtasticUtils.createBoundItemStack(
-                    TotemtasticItems.BLOOD_VIAL, 1, player.getUuid());
-            if (offHandItem.getCount() == 1) {
-                player.setStackInHand(Hand.OFF_HAND, bloodVial);
-            } else {
-                player.giveItemStack(bloodVial);
-                player.setStackInHand(Hand.OFF_HAND, new ItemStack(offHandItem.getItem(), offHandItem.getCount() - 1));
-            }
-            world.playSoundFromEntity(null, player, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1, 1);
-        }*/
     }
 
     public KnifeItem(Settings settings, float attackDamage, float attackSpeed) {
