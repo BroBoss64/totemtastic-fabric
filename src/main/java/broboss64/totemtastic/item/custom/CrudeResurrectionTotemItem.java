@@ -1,7 +1,6 @@
 package broboss64.totemtastic.item.custom;
 
 import broboss64.totemtastic.Totemtastic;
-import broboss64.totemtastic.advancement.ResurrectPlayerCrudeCriterion;
 import broboss64.totemtastic.advancement.TotemtasticCriterion;
 import broboss64.totemtastic.config.TotemtasticClientSyncedConfig;
 import broboss64.totemtastic.item.TotemtasticItems;
