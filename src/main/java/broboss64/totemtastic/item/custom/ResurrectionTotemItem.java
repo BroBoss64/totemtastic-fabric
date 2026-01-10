@@ -1,8 +1,8 @@
 package broboss64.totemtastic.item.custom;
 
 import broboss64.totemtastic.Totemtastic;
+import broboss64.totemtastic.advancement.TotemtasticCriterion;
 import broboss64.totemtastic.config.TotemtasticClientSyncedConfig;
-import broboss64.totemtastic.config.TotemtasticConfig;
 import broboss64.totemtastic.item.TotemtasticItems;
 import broboss64.totemtastic.util.ReviveState;
 import broboss64.totemtastic.util.TotemtasticUtils;
@@ -175,7 +175,6 @@ private HitResult getHitResult(LivingEntity user) {
     private void revivePlayer(World world, UUID deadPlayerUUID, LivingEntity itemUser, HitResult hitResult) {
         if (!world.isClient()) {
             ReviveState state = ReviveState.get((ServerWorld) world);
-            int currentReviveCount = state.getReviveCount(deadPlayerUUID);
             ServerPlayerEntity playerToRevive = (ServerPlayerEntity) TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, deadPlayerUUID);
             World targetDimension = itemUser.getWorld();
             int blockX = (int) hitResult.getPos().x;
@@ -192,6 +191,7 @@ private HitResult getHitResult(LivingEntity user) {
             ((ServerWorld) world).spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, blockX + 0.5, blockY + 1, blockZ + 0.5, 100, 0, 0, 0, 1);
             world.playSoundFromEntity(null, playerToRevive, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1, 1);
             //damages the user, killing them unless they have absorption or bonus health
+            if (itemUser instanceof ServerPlayerEntity serverUser) TotemtasticCriterion.RESURRECT_PLAYER_CRITERION.trigger(serverUser);
             itemUser.damage(world.getDamageSources().magic(), 20);
         }
     }

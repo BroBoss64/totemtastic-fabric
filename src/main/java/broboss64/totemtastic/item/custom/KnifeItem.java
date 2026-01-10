@@ -46,7 +46,6 @@ public class KnifeItem extends Item {
     }
 
     private void fillBloodVial(World world, PlayerEntity player, Hand hand) {
-        ItemStack activeHandStack = player.getStackInHand(hand);
         ItemStack offHandStack = player.getOffHandStack();
         if (offHandStack.getItem() == TotemtasticItems.GLASS_VIAL) {
             //checks if the item in the offhand is a glass vial

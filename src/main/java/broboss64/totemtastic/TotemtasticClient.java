@@ -15,11 +15,17 @@ public class TotemtasticClient implements ClientModInitializer {
             boolean recallTotemDisabled = buf.readBoolean();
 
             client.execute(() -> {
+                Totemtastic.LOGGER.info("Syncing config with server");
                 TotemtasticClientSyncedConfig.crudeResurrectionTotemDisabled = crudeResurrectionTotemDisabled;
+                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.crudeResurrectionTotemDisabled));
                 TotemtasticClientSyncedConfig.resurrectionTotemDisabled = resurrectionTotemDisabled;
+                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.resurrectionTotemDisabled));
                 TotemtasticClientSyncedConfig.umbraMortisDisabled = umbraMortisDisabled;
+                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.umbraMortisDisabled));
                 TotemtasticClientSyncedConfig.wormholeTotemDisabled = wormholeTotemDisabled;
+                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.wormholeTotemDisabled));
                 TotemtasticClientSyncedConfig.recallTotemDisabled = recallTotemDisabled;
+                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.recallTotemDisabled));
             });
         });
     }

@@ -94,7 +94,11 @@ public class RecallTotemItem extends Item {
             if (targetWorld != null && targetPos != null) {
                 serverUser.teleport(targetWorld, targetPos.getX() + 0.5, targetPos.getY(), targetPos.getZ() + 0.5, user.getYaw(), user.getPitch());
                 targetWorld.playSoundFromEntity(null, user, SoundEvents.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.5f, 1);
-                stack.decrement(1);
+                if (Totemtastic.CONFIG.recallTotemConsumed) {
+                    stack.decrement(1);
+                } else {
+                    user.getItemCooldownManager().set(this, 100);
+                }
             } else {
                 Totemtastic.LOGGER.error("Tried to teleport to an invalid position!");
             }
@@ -112,7 +116,7 @@ public class RecallTotemItem extends Item {
                     tooltipCoords.getInt("z")).formatted(Formatting.GRAY));
             tooltip.add(Text.literal("Dimension: " + tooltipCoords.getString("dimension").formatted(Formatting.GRAY)));
         } else {
-            tooltip.add(Text.translatable("tooltip.totemtastic.recall_totem.info").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("item.totemtastic.recall_totem.desc").formatted(Formatting.GRAY));
             tooltip.add(Text.translatable("tooltip.totemtastic.sneak_use").formatted(Formatting.GRAY));
         }
     }

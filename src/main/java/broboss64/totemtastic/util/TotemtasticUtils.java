@@ -2,7 +2,6 @@ package broboss64.totemtastic.util;
 
 import broboss64.totemtastic.Totemtastic;
 import broboss64.totemtastic.item.TotemtasticItems;
-import broboss64.totemtastic.item.custom.TotemShellItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

@@ -1,5 +1,6 @@
 package broboss64.totemtastic;
 
+import broboss64.totemtastic.advancement.TotemtasticCriterion;
 import broboss64.totemtastic.config.TotemtasticConfig;
 import broboss64.totemtastic.effect.custom.UmbraMortisEffect;
 import broboss64.totemtastic.item.TotemtasticItemGroup;
@@ -9,7 +10,6 @@ import broboss64.totemtastic.util.TotemtasticLootConditions;
 import broboss64.totemtastic.util.TotemtasticLootTableModifiers;
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -60,6 +60,7 @@ public class Totemtastic implements ModInitializer {
         TotemtasticLootTableModifiers.modifyLootTables();
         Registry.register(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "umbra_mortis"), UMBRA_MORTIS);
         TotemtasticLootConditions.register();
+        TotemtasticCriterion.register();
 
         //umbra mortis reapplier method
         if (!CONFIG.umbraMortisDisabled) {
@@ -68,13 +69,14 @@ public class Totemtastic implements ModInitializer {
                     ReviveState state = ReviveState.get(player.getServerWorld());
                     int reviveCount = state.getReviveCount(player.getUuid());
                     if (reviveCount <= 0) continue;
-                    if (!player.isAlive()) {
+                    if (!player.isAlive() || player.isSpectator()) {
                         player.removeStatusEffect(Totemtastic.UMBRA_MORTIS);
                         continue;
                     }
                     if (player.hasStatusEffect(Totemtastic.UMBRA_MORTIS)) continue;
                     player.addStatusEffect(new StatusEffectInstance(Totemtastic.UMBRA_MORTIS, Integer.MAX_VALUE,
                             reviveCount - 1, true, false, false));
+                    if (CONFIG.devMode) LOGGER.info(player.getName().getString() + " has been revived before, applying Umbra Mortis");
                 }
             });
         }

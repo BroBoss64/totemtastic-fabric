@@ -87,8 +87,7 @@ public class WormholeTotemItem extends Item {
     @Override
     public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
-        if (!world.isClient() && user instanceof  PlayerEntity) {
-            PlayerEntity playerUsing = (PlayerEntity) user;
+        if (!world.isClient() && user instanceof  PlayerEntity playerUsing) {
             ServerWorld serverWorld = (ServerWorld) world;
             PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, totemUUID);
             if (remainingUseTicks >= 1 && user.getOffHandStack().getItem() != TotemtasticItems.BLOOD_VIAL) {
@@ -120,6 +119,7 @@ public class WormholeTotemItem extends Item {
 
     private void warpToPlayer(World world, PlayerEntity user, UUID targetUUID) {
         PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, targetUUID);
+        ItemStack stack = user.getActiveItem();
         if (targetPlayer != null) {
             //teleports the user to the target player, and removes 1 totem (even though they only stack to 1)
                 ServerPlayerEntity serverUser = (ServerPlayerEntity) user;
@@ -129,9 +129,11 @@ public class WormholeTotemItem extends Item {
                 double targetZ = targetPlayer.getZ();
                 serverUser.teleport((ServerWorld) targetDimension, targetX, targetY, targetZ, targetPlayer.getYaw(), targetPlayer.getPitch());
                 targetDimension.playSoundFromEntity(null, user, SoundEvents.BLOCK_PORTAL_TRAVEL, SoundCategory.PLAYERS, 0.6f, 1);
-                Hand activeHand = user.getActiveHand();
-                user.getStackInHand(activeHand).decrement(1);
-                user.stopUsingItem();
+                if (Totemtastic.CONFIG.wormholeTotemConsumed) {
+                    stack.decrement(1);
+                } else {
+                    user.getItemCooldownManager().set(this, 100);
+                }
         } else {
             Totemtastic.LOGGER.error("Tried to teleport to an invalid player!");
         }

@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "item": "totemtastic:crude_resurrection_totem"
+    },
+    "title": "Revivify",
+    "description": "Bring a dead player back to life using a Crude Totem of Resurrection",
+    "background": "minecraft:textures/block/quartz_block.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "used_item": {
+      "trigger": "totemtastic:resurrect_player_crude"
+    }
+  },
+  "requirements": [
+    [
+      "used_item"
+    ]
+  ]
+}

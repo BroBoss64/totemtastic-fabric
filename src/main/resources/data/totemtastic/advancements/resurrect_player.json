@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "item": "totemtastic:resurrection_totem"
+    },
+    "title": "True Resurrection",
+    "description": "Bring a dead player back to life using a Totem of Resurrection",
+    "background": "minecraft:textures/block/quartz_block.png",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "used_item": {
+      "trigger": "totemtastic:resurrect_player"
+    }
+  },
+  "requirements": [
+    [
+      "used_item"
+    ]
+  ]
+}
