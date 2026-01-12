@@ -49,6 +49,7 @@ public class Totemtastic implements ModInitializer {
             buf.writeBoolean(CONFIG.crudeResurrectionTotemDisabled);
             buf.writeBoolean(CONFIG.resurrectionTotemDisabled);
             buf.writeBoolean(CONFIG.umbraMortisDisabled);
+            buf.writeBoolean(CONFIG.craftableTotemOfUndying);
             buf.writeBoolean(CONFIG.wormholeTotemDisabled);
             buf.writeBoolean(CONFIG.recallTotemDisabled);
 

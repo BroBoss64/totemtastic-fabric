@@ -1,7 +1,6 @@
 package broboss64.totemtastic.item;
 
 import broboss64.totemtastic.Totemtastic;
-import broboss64.totemtastic.config.TotemtasticConfig;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -27,18 +26,18 @@ public class TotemtasticItemGroup {
                         entries.add(TotemtasticItems.QUARTZ_TOTEM_SHELL);
                         entries.add(TotemtasticItems.LAPIS_TOTEM_SHELL);
 
-                        if (!Totemtastic.CONFIG.crudeResurrectionTotemDisabled || !Totemtastic.CONFIG.resurrectionTotemDisabled) entries.add(TotemtasticItems.RESURRECTION_CORE);
-                        if (!Totemtastic.CONFIG.wormholeTotemDisabled || !Totemtastic.CONFIG.recallTotemDisabled) entries.add(TotemtasticItems.TELEPORTATION_CORE);
+                        entries.add(TotemtasticItems.RESURRECTION_CORE);
+                        entries.add(TotemtasticItems.TELEPORTATION_CORE);
                         entries.add(TotemtasticItems.UNDYING_CORE);
 
-                        if (!Totemtastic.CONFIG.crudeResurrectionTotemDisabled || !Totemtastic.CONFIG.resurrectionTotemDisabled) entries.add(TotemtasticItems.RESURRECTION_SMITHING_TEMPLATE);
-                        if (!Totemtastic.CONFIG.wormholeTotemDisabled || !Totemtastic.CONFIG.recallTotemDisabled) entries.add(TotemtasticItems.TELEPORTATION_SMITHING_TEMPLATE);
+                        entries.add(TotemtasticItems.RESURRECTION_SMITHING_TEMPLATE);
+                        entries.add(TotemtasticItems.TELEPORTATION_SMITHING_TEMPLATE);
                         entries.add(TotemtasticItems.UNDYING_SMITHING_TEMPLATE);
 
-                        if (!Totemtastic.CONFIG.crudeResurrectionTotemDisabled) entries.add(TotemtasticItems.CRUDE_RESURRECTION_TOTEM);
-                        if (!Totemtastic.CONFIG.resurrectionTotemDisabled) entries.add(TotemtasticItems.RESURRECTION_TOTEM);
-                        if (!Totemtastic.CONFIG.wormholeTotemDisabled) entries.add(TotemtasticItems.WORMHOLE_TOTEM);
-                        if (!Totemtastic.CONFIG.recallTotemDisabled) entries.add(TotemtasticItems.RECALL_TOTEM);
+                        entries.add(TotemtasticItems.CRUDE_RESURRECTION_TOTEM);
+                        entries.add(TotemtasticItems.RESURRECTION_TOTEM);
+                        entries.add(TotemtasticItems.WORMHOLE_TOTEM);
+                        entries.add(TotemtasticItems.RECALL_TOTEM);
                     }).build());
 
     public static void registerItemGroup() {

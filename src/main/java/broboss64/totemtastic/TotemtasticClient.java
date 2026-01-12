@@ -11,21 +11,24 @@ public class TotemtasticClient implements ClientModInitializer {
             boolean crudeResurrectionTotemDisabled = buf.readBoolean();
             boolean resurrectionTotemDisabled = buf.readBoolean();
             boolean umbraMortisDisabled = buf.readBoolean();
+            boolean craftableTotemOfUndying = buf.readBoolean();
             boolean wormholeTotemDisabled = buf.readBoolean();
             boolean recallTotemDisabled = buf.readBoolean();
 
             client.execute(() -> {
                 Totemtastic.LOGGER.info("Syncing config with server");
                 TotemtasticClientSyncedConfig.crudeResurrectionTotemDisabled = crudeResurrectionTotemDisabled;
-                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.crudeResurrectionTotemDisabled));
+                if (Totemtastic.CONFIG.devMode) Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.crudeResurrectionTotemDisabled));
                 TotemtasticClientSyncedConfig.resurrectionTotemDisabled = resurrectionTotemDisabled;
-                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.resurrectionTotemDisabled));
+                if (Totemtastic.CONFIG.devMode) Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.resurrectionTotemDisabled));
                 TotemtasticClientSyncedConfig.umbraMortisDisabled = umbraMortisDisabled;
-                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.umbraMortisDisabled));
+                if (Totemtastic.CONFIG.devMode) Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.umbraMortisDisabled));
+                TotemtasticClientSyncedConfig.craftableTotemOfUndying = craftableTotemOfUndying;
+                if (Totemtastic.CONFIG.devMode) Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.craftableTotemOfUndying));
                 TotemtasticClientSyncedConfig.wormholeTotemDisabled = wormholeTotemDisabled;
-                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.wormholeTotemDisabled));
+                if (Totemtastic.CONFIG.devMode) Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.wormholeTotemDisabled));
                 TotemtasticClientSyncedConfig.recallTotemDisabled = recallTotemDisabled;
-                Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.recallTotemDisabled));
+                if (Totemtastic.CONFIG.devMode) Totemtastic.LOGGER.info(String.valueOf(TotemtasticClientSyncedConfig.recallTotemDisabled));
             });
         });
     }

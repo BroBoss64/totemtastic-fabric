@@ -8,6 +8,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 
 public class TotemtasticConfig {
+    //this is the server side config, should almost always call this on the server, and use TotemtasticClientSyncedConfig on client
     public static final ConfigClassHandler<TotemtasticConfig> HANDLER =
             ConfigClassHandler.createBuilder(TotemtasticConfig.class).id(new Identifier(Totemtastic.MOD_ID, "config"))
                     .serializer(totemtasticConfigConfigClassHandler -> GsonConfigSerializerBuilder.create(totemtasticConfigConfigClassHandler)
@@ -19,6 +20,9 @@ public class TotemtasticConfig {
     public boolean resurrectionTotemDisabled = false;
     @SerialEntry(comment = "Disables the Umbra Mortis status effect")
     public boolean umbraMortisDisabled = false;
+
+    @SerialEntry(comment = "Controls if the Undying Smithing Template generates, and whether you can craft the Undying Core.")
+    public boolean craftableTotemOfUndying = true;
 
     @SerialEntry(comment = "Disables the Wormhole Totem")
     public boolean wormholeTotemDisabled = false;

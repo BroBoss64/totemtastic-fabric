@@ -22,7 +22,7 @@
   "item.totemtastic.resurrection.warning": "Will deal 10 hearts of damage to the user.",
 
   "item.totemtastic.wormhole_totem": "Wormhole Totem",
-  "item.totemtastic.wormhole_totem.desc": "",
+  "item.totemtastic.wormhole_totem.desc": "Teleports the user to the bound player.",
   "item.totemtastic.recall_totem": "Recall Totem",
   "item.totemtastic.recall_totem.desc": "Teleports the user to the bound position.",
 
@@ -52,6 +52,7 @@
   "tooltip.totemtastic.not_dead": "Player is not dead!",
   "tooltip.totemtastic.dead": "Player is dead!",
   "tooltip.totemtastic.self_teleport": "You can't teleport to yourself!",
+  "tooltip.totemtastic.invalid_target_dimension": "Target dimension is invalid!",
   "tooltip.totemtastic.teleporting_to_prefix": "Teleporting to %s.",
   "tooltip.totemtastic.teleported_to_suffix": "%s is teleporting to you!"
 }

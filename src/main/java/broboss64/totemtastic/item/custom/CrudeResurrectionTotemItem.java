@@ -55,8 +55,8 @@ public class CrudeResurrectionTotemItem extends Item {
             user.sendMessage(Text.translatable("tooltip.totemtastic.hardcore_only").formatted(Formatting.RED), true);
             return TypedActionResult.pass(activeHandStack);
         }
-        if  (world.isClient() && TotemtasticClientSyncedConfig.crudeResurrectionTotemDisabled) {
-            user.sendMessage(Text.translatable("tooltip.totemtastic.item_disabled"), true);
+        if  (!world.isClient() && Totemtastic.CONFIG.crudeResurrectionTotemDisabled) {
+            user.sendMessage(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED), true);
             return TypedActionResult.pass(activeHandStack);
         }
         if (this.getHitResult(user).getType() == HitResult.Type.MISS) {
@@ -105,7 +105,7 @@ public class CrudeResurrectionTotemItem extends Item {
                         return TypedActionResult.consume(activeHandStack);
                     }
                 }
-            } else return TypedActionResult.consume(activeHandStack);
+            }
         }
         //if player isn't looking at a block or the air, do nothing.
         return TypedActionResult.pass(activeHandStack);
@@ -154,22 +154,27 @@ public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> too
                 UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
                 PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
                 if (entry != null) {
+                    //shows name once bound
                     tooltip.add(Text.translatable("tooltip.totemtastic.will_resurrect_prefix", entry.getProfile().getName()).formatted(Formatting.GRAY));
                     tooltip.add(Text.translatable("item.totemtastic.resurrection.warning").formatted(Formatting.DARK_RED));
                 } else {
+                    //unless player is offline
                     tooltip.add(Text.translatable("tooltip.totemtastic.will_resurrect_prefix", "an offline player").formatted(Formatting.GRAY));
                     tooltip.add(Text.translatable("item.totemtastic.resurrection.warning").formatted(Formatting.DARK_RED));
                 }
 
             } else {
+                //default tooltip
                 tooltip.add(Text.translatable("item.totemtastic.resurrection.desc").formatted(Formatting.GRAY));
                 tooltip.add(Text.translatable("item.totemtastic.crude_resurrection_totem.desc").formatted(Formatting.DARK_RED));
                 tooltip.add(Text.translatable("tooltip.totemtastic.blood_vial_use").formatted(Formatting.GRAY));
             }
         } else {
+            //when item disabled
             tooltip.add(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED));
         }
     } else {
+        //when world isn't hardcore
         tooltip.add(Text.translatable("tooltip.totemtastic.hardcore_only").formatted(Formatting.RED));
     }
 }

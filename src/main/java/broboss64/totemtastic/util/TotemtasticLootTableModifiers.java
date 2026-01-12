@@ -2,6 +2,9 @@ package broboss64.totemtastic.util;
 
 import broboss64.totemtastic.item.TotemtasticItems;
 import broboss64.totemtastic.util.loot.IsHardcoreLootCondition;
+import broboss64.totemtastic.util.loot.ResurrectionEnabledLootCondition;
+import broboss64.totemtastic.util.loot.TeleportationEnabledLootCondition;
+import broboss64.totemtastic.util.loot.UndyingEnabledLootCondition;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.condition.RandomChanceLootCondition;
@@ -26,6 +29,7 @@ public class TotemtasticLootTableModifiers {
             if (WOODLAND_MANSION_CHEST_ID.equals(identifier)) {
                 LootPool.Builder poolBuilder = LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1))
+                        .conditionally(UndyingEnabledLootCondition::new)
                         .conditionally(RandomChanceLootCondition.builder(0.4f))
                         .with(ItemEntry.builder(TotemtasticItems.UNDYING_SMITHING_TEMPLATE))
                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());
@@ -35,6 +39,7 @@ public class TotemtasticLootTableModifiers {
                 LootPool.Builder poolBuilder = LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1))
                         .conditionally(IsHardcoreLootCondition::new)
+                        .conditionally(ResurrectionEnabledLootCondition::new)
                         .conditionally(RandomChanceLootCondition.builder(0.2f))
                         .with(ItemEntry.builder(TotemtasticItems.RESURRECTION_SMITHING_TEMPLATE))
                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());
@@ -44,6 +49,7 @@ public class TotemtasticLootTableModifiers {
                 LootPool.Builder poolBuilder = LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1))
                         .conditionally(IsHardcoreLootCondition::new)
+                        .conditionally(ResurrectionEnabledLootCondition::new)
                         .conditionally(RandomChanceLootCondition.builder(0.8f))
                         .with(ItemEntry.builder(TotemtasticItems.RESURRECTION_SMITHING_TEMPLATE))
                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());
@@ -52,6 +58,7 @@ public class TotemtasticLootTableModifiers {
             if (FORTRESS_CHEST_ID.equals(identifier)) {
                 LootPool.Builder poolBuilder = LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1))
+                        .conditionally(TeleportationEnabledLootCondition::new)
                         .conditionally(RandomChanceLootCondition.builder(0.1f))
                         .with(ItemEntry.builder(TotemtasticItems.TELEPORTATION_SMITHING_TEMPLATE))
                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());
@@ -60,6 +67,7 @@ public class TotemtasticLootTableModifiers {
             if (STRONGHOLD_CORRIDOR_CHEST_ID.equals(identifier)) {
                 LootPool.Builder poolBuilder = LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1))
+                        .conditionally(TeleportationEnabledLootCondition::new)
                         .conditionally(RandomChanceLootCondition.builder(0.2f))
                         .with(ItemEntry.builder(TotemtasticItems.TELEPORTATION_SMITHING_TEMPLATE))
                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());
@@ -68,6 +76,7 @@ public class TotemtasticLootTableModifiers {
             if (ANCIENT_CITY_CHEST_ID.equals(identifier)) {
                 LootPool.Builder poolBuilder = LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1))
+                        .conditionally(TeleportationEnabledLootCondition::new)
                         .conditionally(RandomChanceLootCondition.builder(0.4f))
                         .with(ItemEntry.builder(TotemtasticItems.TELEPORTATION_SMITHING_TEMPLATE))
                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());
@@ -85,6 +94,7 @@ public class TotemtasticLootTableModifiers {
             if (EVOKER_ENTITY_ID.equals(identifier)) {
                 LootPool.Builder poolBuilder = LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1))
+                        .conditionally(UndyingEnabledLootCondition::new)
                         .conditionally(RandomChanceLootCondition.builder(0.1f))
                         .with(ItemEntry.builder(TotemtasticItems.UNDYING_SMITHING_TEMPLATE))
                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0f, 1.0f)).build());

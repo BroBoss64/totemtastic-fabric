@@ -1,6 +1,7 @@
 package broboss64.totemtastic.item.custom;
 
 import broboss64.totemtastic.Totemtastic;
+import broboss64.totemtastic.config.TotemtasticClientSyncedConfig;
 import broboss64.totemtastic.util.TotemtasticUtils;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -38,27 +39,40 @@ public class RecallTotemItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack activeHandStack = user.getStackInHand(hand);
+        ItemStack activeHandStack = user.getStackInHand(hand);;
         if (!world.isClient()) {
-            if (Totemtastic.CONFIG.recallTotemDisabled) {
-                user.sendMessage(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED));
+            if (!Totemtastic.CONFIG.recallTotemDisabled) {
+                BlockPos targetPos = TotemtasticUtils.fetchBlockPosFromItemStack(activeHandStack);
+                ServerWorld targetWorld = TotemtasticUtils.fetchDimensionFromItemStack(activeHandStack, world.getServer());
+                if (user.isSneaking()) {
+                    //binds totem to the players position
+                    TotemtasticUtils.createPositionLinkedTotem(user.getBlockPos(), world, user);
+                    int boundX = user.getBlockX();
+                    int boundY = user.getBlockY();
+                    int boundZ = user.getBlockZ();
+                    //sends the player a message telling them where its bound
+                    user.sendMessage(Text.literal("Bound to X: " + boundX + ", Y: " + boundY + ", Z: " + boundZ).formatted(Formatting.AQUA), true);
+                    return TypedActionResult.success(activeHandStack, true);
+                } else if (targetPos == null) {
+                    //handles unbound/invalid blockpos
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.not_bound").formatted(Formatting.RED), true);
+                    return TypedActionResult.pass(activeHandStack);
+                } else if (targetWorld == null) {
+                    //handles invalid dimension id, such as removing a mod mid-playthrough
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.invalid_target_dimension").formatted(Formatting.RED), true);
+                    return TypedActionResult.pass(activeHandStack);
+                } else {
+                    //if not sneaking, do normal functionality
+                    user.setCurrentHand(hand);
+                    return TypedActionResult.consume(activeHandStack);
+                }
+            } else {
+                //if item is disabled, inform the user
+                user.sendMessage(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED), true);
                 return TypedActionResult.pass(activeHandStack);
             }
-            if (user.isSneaking()) {
-                //binds totem to the players position
-                TotemtasticUtils.createPositionLinkedTotem(user.getBlockPos(), world, user);
-                int boundX = user.getBlockX();
-                int boundY = user.getBlockY();
-                int boundZ = user.getBlockZ();
-                //sends the player a message telling them where its bound
-                user.sendMessage(Text.literal("Bound to X: " + boundX + ", Y: " + boundY + ", Z: " + boundZ).formatted(Formatting.AQUA), true);
-                return TypedActionResult.success(activeHandStack, true);
-            } else {
-                //if not sneaking, do normal functionality
-                user.setCurrentHand(hand);
-                return TypedActionResult.consume(activeHandStack);
-            }
-        } else return TypedActionResult.consume(activeHandStack);
+        }
+        return TypedActionResult.pass(activeHandStack);
     }
 
     @Override
@@ -107,17 +121,23 @@ public class RecallTotemItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        NbtCompound nbt = stack.getNbt();
-        if (nbt != null && nbt.contains(Totemtastic.POSITION_KEY)) {
-            NbtCompound tooltipCoords = nbt.getCompound(Totemtastic.POSITION_KEY);
-            tooltip.add(Text.literal("X: " +
-                    tooltipCoords.getInt("x") + ", Y: " +
-                    tooltipCoords.getInt("y") + ", Z: " +
-                    tooltipCoords.getInt("z")).formatted(Formatting.GRAY));
-            tooltip.add(Text.literal("Dimension: " + tooltipCoords.getString("dimension").formatted(Formatting.GRAY)));
+        if (!TotemtasticClientSyncedConfig.recallTotemDisabled) {
+            NbtCompound nbt = stack.getNbt();
+            if (nbt != null && nbt.contains(Totemtastic.POSITION_KEY)) {
+                //shows pos once bound
+                NbtCompound tooltipCoords = nbt.getCompound(Totemtastic.POSITION_KEY);
+                tooltip.add(Text.literal("X: " +
+                        tooltipCoords.getInt("x") + ", Y: " +
+                        tooltipCoords.getInt("y") + ", Z: " +
+                        tooltipCoords.getInt("z")).formatted(Formatting.GRAY));
+                tooltip.add(Text.literal("Dimension: " + tooltipCoords.getString("dimension").formatted(Formatting.GRAY)));
+            } else {
+                //default tooltip
+                tooltip.add(Text.translatable("item.totemtastic.recall_totem.desc").formatted(Formatting.GRAY));
+                tooltip.add(Text.translatable("tooltip.totemtastic.sneak_use").formatted(Formatting.GRAY));
+            }
         } else {
-            tooltip.add(Text.translatable("item.totemtastic.recall_totem.desc").formatted(Formatting.GRAY));
-            tooltip.add(Text.translatable("tooltip.totemtastic.sneak_use").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED));
         }
     }
 

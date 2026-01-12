@@ -51,12 +51,14 @@ public class ResurrectionTotemItem extends Item {
         ItemStack activeHandStack = user.getStackInHand(hand);
         ItemStack offHandStack = user.getOffHandStack();
         if  (!world.getLevelProperties().isHardcore()) {
+            //blocks use in non-hardcore worlds
             user.sendMessage(Text.translatable("tooltip.totemtastic.hardcore_only").formatted(Formatting.RED), true);
-            return TypedActionResult.fail(activeHandStack);
+            return TypedActionResult.pass(activeHandStack);
         }
-        if  (world.isClient() && TotemtasticClientSyncedConfig.resurrectionTotemDisabled) {
+        if  (!world.isClient() && Totemtastic.CONFIG.resurrectionTotemDisabled) {
+            //blocks use when disabled
             user.sendMessage(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED), true);
-            return TypedActionResult.fail(activeHandStack);
+            return TypedActionResult.pass(activeHandStack);
         }
         if (this.getHitResult(user).getType() == HitResult.Type.MISS) {
             //only runs if player isn't looking at the air
@@ -70,6 +72,7 @@ public class ResurrectionTotemItem extends Item {
                     return TypedActionResult.consume(activeHandStack);
                 }
             } else {
+                //do nothing if no blood vial in offhand
                 return TypedActionResult.pass(activeHandStack);
             }
         }
@@ -87,24 +90,24 @@ public class ResurrectionTotemItem extends Item {
                 } else if (targetUUID == null) {
                     //handles null UUID
                     user.sendMessage(Text.translatable("tooltip.totemtastic.not_bound").formatted(Formatting.RED), true);
-                    return TypedActionResult.fail(activeHandStack);
+                    return TypedActionResult.pass(activeHandStack);
                 } else {
                     PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, targetUUID);
                     if (targetPlayer == null) {
                         //if PlayerEntity doesn't exist, cancel usage
                         user.sendMessage(Text.translatable("tooltip.totemtastic.player_offline").formatted(Formatting.RED), true);
-                        return TypedActionResult.fail(activeHandStack);
+                        return TypedActionResult.pass(activeHandStack);
                     } else if (!targetPlayer.isSpectator()) {
                         //if player isn't in spectator mode, cancel usage
                         user.sendMessage(Text.translatable("tooltip.totemtastic.not_dead").formatted(Formatting.RED), true);
-                        return TypedActionResult.fail(activeHandStack);
+                        return TypedActionResult.pass(activeHandStack);
                     } else {
                         //only runs if PlayerEntity is valid, and is in spectator mode
                         user.setCurrentHand(hand);
                         return TypedActionResult.consume(activeHandStack);
                     }
                 }
-            } else return TypedActionResult.consume(activeHandStack);
+            }
         }
         //if player isn't looking at a block or the air, do nothing.
         return TypedActionResult.pass(activeHandStack);
@@ -153,22 +156,27 @@ private HitResult getHitResult(LivingEntity user) {
                     UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
                     PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
                     if (entry != null) {
+                        //shows name once bound
                         tooltip.add(Text.translatable("tooltip.totemtastic.will_resurrect_prefix", entry.getProfile().getName()).formatted(Formatting.GRAY));
                         tooltip.add(Text.translatable("item.totemtastic.resurrection.warning").formatted(Formatting.DARK_RED));
                     } else {
+                        //unless player is offline
                         tooltip.add(Text.translatable("tooltip.totemtastic.will_resurrect_prefix", "an offline player.").formatted(Formatting.GRAY));
                         tooltip.add(Text.translatable("item.totemtastic.resurrection.warning").formatted(Formatting.DARK_RED));
                     }
 
                 } else {
+                    //default tooltip
                     tooltip.add(Text.translatable("item.totemtastic.resurrection.desc").formatted(Formatting.GRAY));
                     tooltip.add(Text.translatable("item.totemtastic.resurrection_totem.desc").formatted(Formatting.AQUA));
                     tooltip.add(Text.translatable("tooltip.totemtastic.blood_vial_use").formatted(Formatting.GRAY));
                 }
             } else {
+                //when item disabled
                 tooltip.add(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED));
             }
         } else {
+            //when world isn't hardcore
             tooltip.add(Text.translatable("tooltip.totemtastic.hardcore_only").formatted(Formatting.RED));
         }
     }

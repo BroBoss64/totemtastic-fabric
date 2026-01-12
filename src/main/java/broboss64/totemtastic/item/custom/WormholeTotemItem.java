@@ -1,6 +1,7 @@
 package broboss64.totemtastic.item.custom;
 
 import broboss64.totemtastic.Totemtastic;
+import broboss64.totemtastic.config.TotemtasticClientSyncedConfig;
 import broboss64.totemtastic.item.TotemtasticItems;
 import broboss64.totemtastic.util.TotemtasticUtils;
 import net.minecraft.client.MinecraftClient;
@@ -45,43 +46,49 @@ public class WormholeTotemItem extends Item {
         ItemStack mainHandStack = user.getMainHandStack();
         ItemStack offHandStack = user.getOffHandStack();
         if (!world.isClient()) {
-            //only triggers if in main hand
-            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(activeHandStack);
-            PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, totemUUID);
-            if (offHandStack.getItem() == TotemtasticItems.BLOOD_VIAL) {
-                //handles binding of totem
-                UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(offHandStack);
-                TotemtasticUtils.bindTotemFromVial(user);
-                String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
-                user.sendMessage(Text.translatable("tooltip.totemtastic.bound_to_prefix", boundToName), true);
-                return TypedActionResult.consume(activeHandStack);
-            } else if (totemUUID == null) {
-                //handles null uuid
-                user.sendMessage(Text.translatable("tooltip.totemtastic.not_bound").formatted(Formatting.RED), true);
-                user.stopUsingItem();
-                return TypedActionResult.fail(activeHandStack);
-            } else if (targetPlayer == null) {
-                //handles offline player
-                user.sendMessage(Text.translatable("tooltip.totemtastic.player_offline").formatted(Formatting.RED), true);
-                user.stopUsingItem();
-                return TypedActionResult.fail(activeHandStack);
-            } else if (!targetPlayer.isAlive() || targetPlayer.isSpectator()) {
-                //handles dead players or ones in spectator
-                user.sendMessage(Text.translatable("tooltip.totemtastic.dead").formatted(Formatting.RED), true);
-                user.stopUsingItem();
-                return TypedActionResult.fail(activeHandStack);
-            } else if (targetPlayer == user) {
-                //handles teleporting to yourself
-                user.sendMessage(Text.translatable("tooltip.totemtastic.self_teleport").formatted(Formatting.RED), true);
-                user.stopUsingItem();
-                return TypedActionResult.fail(activeHandStack);
+            //only runs on the server side
+            if (!Totemtastic.CONFIG.wormholeTotemDisabled) {
+                //only runs if the totem isn't disabled
+                UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(activeHandStack);
+                PlayerEntity targetPlayer = TotemtasticUtils.getPlayerEntityFromUUID((ServerWorld) world, totemUUID);
+                if (offHandStack.getItem() == TotemtasticItems.BLOOD_VIAL) {
+                    //handles binding of totem
+                    UUID bloodVialUUID = TotemtasticUtils.fetchUUIDFromItemStack(offHandStack);
+                    TotemtasticUtils.bindTotemFromVial(user);
+                    String boundToName = TotemtasticUtils.getUsernameFromUUID(bloodVialUUID, world.getServer());
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.bound_to_prefix", boundToName), true);
+                    return TypedActionResult.consume(activeHandStack);
+                } else if (totemUUID == null) {
+                    //handles null uuid
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.not_bound").formatted(Formatting.RED), true);
+                    user.stopUsingItem();
+                    return TypedActionResult.fail(activeHandStack);
+                } else if (targetPlayer == null) {
+                    //handles offline player
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.player_offline").formatted(Formatting.RED), true);
+                    user.stopUsingItem();
+                    return TypedActionResult.fail(activeHandStack);
+                } else if (!targetPlayer.isAlive() || targetPlayer.isSpectator()) {
+                    //handles dead players or ones in spectator
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.dead").formatted(Formatting.RED), true);
+                    user.stopUsingItem();
+                    return TypedActionResult.fail(activeHandStack);
+                } else if (targetPlayer == user) {
+                    //handles teleporting to yourself
+                    user.sendMessage(Text.translatable("tooltip.totemtastic.self_teleport").formatted(Formatting.RED), true);
+                    user.stopUsingItem();
+                    return TypedActionResult.fail(activeHandStack);
+                } else {
+                    //if no errors, run normally
+                    user.setCurrentHand(hand);
+                    return TypedActionResult.consume(activeHandStack);
+                }
             } else {
-                //if no errors, run normally
-                user.setCurrentHand(hand);
-                return TypedActionResult.consume(activeHandStack);
+                user.sendMessage(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED), true);
+                return TypedActionResult.pass(activeHandStack);
             }
         }
-        return TypedActionResult.consume(activeHandStack);
+        return TypedActionResult.pass(activeHandStack);
     }
 
     @Override
@@ -142,20 +149,26 @@ public class WormholeTotemItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         NbtCompound nbt = stack.getNbt();
-        if (nbt != null && nbt.contains(Totemtastic.PLAYER_UUID_KEY)) {
-            UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
-            MinecraftClient client = MinecraftClient.getInstance();
-            PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
-            if (entry != null) {
-                tooltip.add(Text.translatable("tooltip.totemtastic.warp_to_prefix", entry.getProfile().getName()).formatted(Formatting.GRAY));
-            } else {
-                tooltip.add(Text.translatable("tooltip.totemtastic.warp_to_prefix", "an offline player").formatted(Formatting.GRAY));
-            }
+        if (!TotemtasticClientSyncedConfig.wormholeTotemDisabled) {
+            if (nbt != null && nbt.contains(Totemtastic.PLAYER_UUID_KEY)) {
+                //bound to tooltip
+                UUID totemUUID = TotemtasticUtils.fetchUUIDFromItemStack(stack);
+                MinecraftClient client = MinecraftClient.getInstance();
+                PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(totemUUID);
+                if (entry != null) {
+                    tooltip.add(Text.translatable("tooltip.totemtastic.warp_to_prefix", entry.getProfile().getName()).formatted(Formatting.GRAY));
+                } else {
+                    tooltip.add(Text.translatable("tooltip.totemtastic.warp_to_prefix", "an offline player").formatted(Formatting.GRAY));
+                }
 
+            } else {
+                //default tooltip
+                tooltip.add(Text.translatable("item.totemtastic.wormhole_totem.desc").formatted(Formatting.GRAY));
+                tooltip.add(Text.translatable("tooltip.totemtastic.blood_vial_use").formatted(Formatting.GRAY));
+            }
         } else {
-            //default tooltip
-            tooltip.add(Text.translatable("item.totemtastic.wormhole_totem.desc").formatted(Formatting.GRAY));
-            tooltip.add(Text.translatable("tooltip.totemtastic.blood_vial_use").formatted(Formatting.GRAY));
+            //item disabled tooltip
+            tooltip.add(Text.translatable("tooltip.totemtastic.item_disabled").formatted(Formatting.RED));
         }
     }
 
